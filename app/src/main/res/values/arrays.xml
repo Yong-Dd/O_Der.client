@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="paymentMethod">
+        <item>카드 결제</item>
+        <item>무통장 입금</item>
+        <item>만나서 결제</item>
+    </string-array>
+</resources>
