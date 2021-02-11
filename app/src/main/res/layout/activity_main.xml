@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_gravity="right|center_vertical"
-            android:background="@drawable/main_login_button"
+            android:background="@drawable/main_button"
             android:paddingTop="0dp"
             android:text="로그인"
             android:textColor="@color/white"
@@ -55,8 +55,9 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_gravity="center_vertical"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_launcher_foreground" />
+            android:visibility="visible"
+            app:srcCompat="@drawable/ic_launcher_foreground"
+            tools:ignore="VectorDrawableCompat" />
     </LinearLayout>
 
     <FrameLayout

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="arrowTitle">40dp</dimen>
+    <dimen name="arrowLittle">30dp</dimen>
+    <dimen name="titleText">24sp</dimen>
+    <dimen name="subTitleText">20sp</dimen>
+    <dimen name="titleRight">50dp</dimen>
+    <dimen name="titleTop">10dp</dimen>
+    <dimen name="arrowLeft">10dp</dimen>
+    <dimen name="titleBottom">20dp</dimen>
+</resources>

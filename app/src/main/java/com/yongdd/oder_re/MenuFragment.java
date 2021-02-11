@@ -1,5 +1,6 @@
 package com.yongdd.oder_re;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,11 +9,45 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MenuFragment extends Fragment {
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.menu_fragment,container,false);
+        View view = inflater.inflate(R.layout.menu_fragment,container,false);
+
+        //menu List RecyclerView
+        RecyclerView menuListRecyclerView = (RecyclerView) view.findViewById(R.id.menuListRecycleview);
+        MenuListAdapter menuListAdapter = new MenuListAdapter();
+        menuListAdapter.addItem("COFFEE");
+        menuListAdapter.addItem("NONCOFFEE");
+        menuListAdapter.addItem("TEA");
+        menuListAdapter.addItem("JUICE");
+        menuListAdapter.addItem("DESSERT");
+
+        menuListRecyclerView.setHasFixedSize(true);
+        menuListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
+        menuListRecyclerView.setAdapter(menuListAdapter);
+
+
+        //menu RecyclerView
+        RecyclerView menuRecyclerView = (RecyclerView)view.findViewById(R.id.menuRecyclerview);
+        MenuAdapter menuAdapter = new MenuAdapter();
+
+        menuAdapter.addItem(new Menu(1,"아메리카노",3000,
+                0,"0"));
+        menuAdapter.addItem(new Menu(2,"카페 모카",4000,
+                0,"0"));
+        menuAdapter.addItem(new Menu(3,"아인슈페너",5000,
+                0,"0"));
+
+        menuRecyclerView.setHasFixedSize(true);
+        menuRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        menuRecyclerView.setAdapter(menuAdapter);
+
+        return view;
     }
 }

@@ -13,6 +13,8 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class PaymentFragment extends Fragment {
     @Nullable
@@ -22,7 +24,18 @@ public class PaymentFragment extends Fragment {
 
         spinnerSetting(view);
 
-        return inflater.inflate(R.layout.payment_fragment,container,false);
+        //선택한 주문 목록 리싸이클러뷰
+        RecyclerView choiceMenuRecyclerView = (RecyclerView)view.findViewById(R.id.choiceMenuList);
+        PaymentAdapter paymentAdapter = new PaymentAdapter();
+
+        paymentAdapter.addItem(new Payment("아메리카노",1,3000));
+        paymentAdapter.addItem(new Payment("카페 모카",1,4000));
+
+        choiceMenuRecyclerView.setHasFixedSize(true);
+        choiceMenuRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        choiceMenuRecyclerView.setAdapter(paymentAdapter);
+
+        return view;
     }
 
     public void spinnerSetting(View view){
