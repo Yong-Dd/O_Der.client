@@ -2,6 +2,8 @@ package com.yongdd.oder_re;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -9,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class OrderList extends AppCompatActivity {
@@ -28,6 +29,22 @@ public class OrderList extends AppCompatActivity {
         orderListRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         orderListRecyclerview.setAdapter(adapter);
 
+        Button backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        overridePendingTransition(R.anim.page_slide_in_left, R.anim.page_slide_out_right);
     }
 }

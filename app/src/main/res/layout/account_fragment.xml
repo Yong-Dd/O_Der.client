@@ -10,7 +10,7 @@
     tools:context=".AccountFragment">
 
     <FrameLayout
-        android:id="@+id/noLogIn"
+        android:id="@+id/A_noLogIn"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">
@@ -23,7 +23,7 @@
             android:gravity="center"
             android:text="로그인이 필요한 페이지입니다!\n 로그인을 먼저 해주세요:D"
             android:textColor="@color/black"
-            android:textSize="20sp" />
+            android:textSize="@dimen/announceText" />
     </FrameLayout>
 
     <LinearLayout

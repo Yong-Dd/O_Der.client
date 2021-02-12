@@ -14,7 +14,7 @@
         android:orientation="horizontal">
 
         <android.widget.Button
-            android:id="@+id/S_backButton"
+            android:id="@+id/backButton"
             android:layout_width="@dimen/arrowTitle"
             android:layout_height="@dimen/arrowTitle"
             android:layout_gravity="left"

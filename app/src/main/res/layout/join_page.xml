@@ -23,7 +23,7 @@
                 android:orientation="vertical">
 
                 <android.widget.Button
-                    android:id="@+id/close_btn"
+                    android:id="@+id/J_xButton"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_gravity="right"
@@ -71,7 +71,7 @@
                         android:layout_marginRight="10dp"
                         android:backgroundTint="@drawable/input_focus"
                         android:hint="아이디(메일)"
-                        android:inputType="textVisiblePassword"
+                        android:inputType="textEmailAddress"
                         android:maxLines="1"
                         android:textCursorDrawable="@drawable/cursor"
                         android:textSize="18sp" />

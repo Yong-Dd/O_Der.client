@@ -1,15 +1,18 @@
 package com.yongdd.oder_re;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -20,6 +23,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     AccountFragment accountFragment;
 
     Button loginButton;
+    LinearLayout login_success;
+    TextView customerName;
+
+    final int REQUEST_CODE = 100;
+    public static boolean LOGIN_SUCCESS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +38,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menuFragment = new MenuFragment();
         paymentFragment = new PaymentFragment();
         accountFragment = new AccountFragment();
+
+        login_success = (LinearLayout) findViewById(R.id.logIn_success);
+        loginButton = (Button) findViewById(R.id.loginButton);
+        customerName =(TextView) findViewById(R.id.customerName);
+
+        loginButton.setOnClickListener(this);
+
+        LOGIN_SUCCESS = false;
 
         //어플 시작시 홈으로 이동
         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,homeFragment).commit();
@@ -49,9 +65,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         bottomNavigationView.setSelectedItemId(R.id.homeTab);
 
-        loginButton = findViewById(R.id.loginButton);
-        loginButton.setOnClickListener(this);
-
+        Intent intent = getIntent();
+        if(intent!=null){
+            Log.d("Result","intent not null");
+            logInCheck(intent);
+        }
 
 
     }
@@ -78,9 +96,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v.equals(loginButton)) {
             Intent intent = new Intent(this,LogIn.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);
             Bundle bundle = ActivityOptions.makeCustomAnimation(this, R.anim.page_slide_in_right, R.anim.page_slide_out_left).toBundle();
             startActivity(intent,bundle);
-        };
+        }
 
+    }
+    private void logInCheck(Intent intent){
+        Log.d("Result","logIncheck");
+        if(intent!=null){
+            Log.d("Result","logIncheck_ intent not null");
+            Bundle bundle = intent.getExtras();
+
+            if(bundle!=null){
+                Log.d("Result","logIncheck_ bundle not null");
+                String logIn = bundle.getString("logIn");
+                if(logIn.equals("true")){
+                    Log.d("Result","logIncheck_ logInsetting go");
+                    logInSetting(true,"실험");
+                }else{
+                    Log.d("Result","logInCheck log In false");
+                }
+            }else{
+                Log.d("Result","logIncheck_ bundle  null");
+            }
+        }else{
+            Log.d("Result","logIncheck_ intent null");
+        }
+    }
+
+    public void logInSetting(boolean login, String name){
+        Log.d("logIn Result","logInsetting called");
+        if(login){
+            Log.d("logIn Result","login true");
+            //메인페이지 세팅
+            if(loginButton!=null){
+                loginButton.setVisibility(View.GONE);
+            }else{
+                Log.d("logIn Result","loginButton is null");
+            }
+
+            customerName.setText(name);
+            login_success.setVisibility(View.VISIBLE);
+
+            //프레그먼트 세팅
+            LOGIN_SUCCESS = true;
+
+        }else{
+            Log.d("logIn Result","login false");
+            //메인페이지 세팅
+            loginButton.setVisibility(View.VISIBLE);
+            login_success.setVisibility(View.GONE);
+
+            //프레그먼트 세팅
+            LOGIN_SUCCESS = false;
+        }
     }
 }

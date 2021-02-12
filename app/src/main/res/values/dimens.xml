@@ -8,4 +8,5 @@
     <dimen name="titleTop">10dp</dimen>
     <dimen name="arrowLeft">10dp</dimen>
     <dimen name="titleBottom">20dp</dimen>
+    <dimen name="announceText">20sp</dimen>
 </resources>
