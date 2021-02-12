@@ -1,6 +1,7 @@
 package com.yongdd.oder_re;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,7 +20,8 @@ public class LogIn extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(),Join.class);
-                startActivity(intent);
+                Bundle bundle = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.page_slide_in_right, R.anim.page_slide_out_left).toBundle();
+                startActivity(intent,bundle);
             }
         });
     }

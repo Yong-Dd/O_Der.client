@@ -4,6 +4,6 @@
     >
 
     <item
-        android:color="@color/white"
+        android:color="@color/mainColor"
         /> <!-- default -->
 </selector>

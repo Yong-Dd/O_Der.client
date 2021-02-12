@@ -2,21 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/homeTab"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:title="홈"
+        android:enabled="true"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/menuTab"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_emoji_food_beverage_24"
         android:title="메뉴"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/homeTab"
-        android:icon="@drawable/ic_baseline_home_24"
-        android:title="홈"
-        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/paymentTab"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_shopping_cart_24"
         android:title="장바구니"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/accountTab"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_supervisor_account_24"
+        android:title="마이"
         app:showAsAction="ifRoom" />
 
 </menu>

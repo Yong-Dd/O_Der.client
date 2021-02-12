@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.O_Der">
-        <activity android:name=".Account"></activity>
+        <activity android:name=".AccountFragment" android:windowSoftInputMode="adjustNothing"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,8 +17,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LogIn" />
-        <activity android:name=".Join" />
+        <activity android:name=".LogIn" android:windowSoftInputMode="adjustNothing" />
+        <activity android:name=".Join" android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".OrderList" />
         <activity android:name=".Stamp" />
     </application>

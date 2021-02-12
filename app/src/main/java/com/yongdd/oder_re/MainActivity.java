@@ -3,7 +3,7 @@ package com.yongdd.oder_re;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -13,10 +13,13 @@ import android.widget.ImageView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     HomeFragment homeFragment;
     MenuFragment menuFragment;
     PaymentFragment paymentFragment;
+    AccountFragment accountFragment;
+
+    Button loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +29,9 @@ public class MainActivity extends AppCompatActivity {
         homeFragment = new HomeFragment();
         menuFragment = new MenuFragment();
         paymentFragment = new PaymentFragment();
+        accountFragment = new AccountFragment();
 
+        //어플 시작시 홈으로 이동
         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,homeFragment).commit();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -44,22 +49,10 @@ public class MainActivity extends AppCompatActivity {
         });
         bottomNavigationView.setSelectedItemId(R.id.homeTab);
 
-        Button loginButton = findViewById(R.id.loginButton);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),LogIn.class);
-                startActivity(intent);
-            }
-        });
-        ImageView accountImg = findViewById(R.id.accountImg);
-        accountImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(),Account.class);
-                startActivity(intent);
-            }
-        });
+        loginButton = findViewById(R.id.loginButton);
+        loginButton.setOnClickListener(this);
+
+
 
     }
 
@@ -74,7 +67,20 @@ public class MainActivity extends AppCompatActivity {
             case R.id.paymentTab:
                 getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
                 return true;
+            case R.id.accountTab:
+                getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,accountFragment).commit();
+                return true;
             default:return false;
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.equals(loginButton)) {
+            Intent intent = new Intent(this,LogIn.class);
+            Bundle bundle = ActivityOptions.makeCustomAnimation(this, R.anim.page_slide_in_right, R.anim.page_slide_out_left).toBundle();
+            startActivity(intent,bundle);
+        };
+
     }
 }

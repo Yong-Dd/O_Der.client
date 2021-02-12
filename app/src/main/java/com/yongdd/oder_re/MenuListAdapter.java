@@ -77,12 +77,10 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.MenuVi
         @SuppressLint("ResourceAsColor")
         public void buttonSetting(){
             if(btnState){
-                menuListName.setBackgroundColor(R.color.white);
                 menuListName.setTextColor(getColorStateList(context,R.color.menu_list_nofocus_button));
                 btnState = false;
 
             }else if(!btnState){
-                menuListName.setBackgroundResource(R.drawable.main_button);
                 menuListName.setTextColor(getColorStateList(context,R.color.menu_list_focus_button));
                 btnState = true;
             }

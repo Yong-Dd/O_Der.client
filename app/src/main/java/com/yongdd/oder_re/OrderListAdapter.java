@@ -5,12 +5,15 @@ import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -58,20 +61,30 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
 
 
     public class OrderListViewHolder extends RecyclerView.ViewHolder{
+        TextView orderDate;
         TextView orderReceived;
         TextView orderAccepted;
         TextView orderCompleted;
         TextView totalCount;
         RecyclerView orderListRecycler;
-        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd  HH:mm");
+        ProgressBar orderProgressBar;
+        TextView acceptedProgress;
+        TextView completedProgress;
+        SimpleDateFormat date1 = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat date2 = new SimpleDateFormat("HH:ss");
 
         public OrderListViewHolder(@NonNull View itemView) {
             super(itemView);
+            orderDate = itemView.findViewById(R.id.O_date);
             orderReceived = itemView.findViewById(R.id.orderRecivedDate);
             orderAccepted = itemView.findViewById(R.id.orderAcceptedDate);
             orderCompleted = itemView.findViewById(R.id.orderCompletedDate);
             totalCount = itemView.findViewById(R.id.inO_totalPrice);
             orderListRecycler = itemView.findViewById(R.id.O_orderListRecyclerview);
+            orderProgressBar = itemView.findViewById(R.id.orderProgressBar);
+            acceptedProgress = itemView.findViewById(R.id.acceptedProgress);
+            completedProgress = itemView.findViewById(R.id.completedProgress);
+            orderProgressBar.setMax(10);
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
         public void setItem(Order orderList){
@@ -79,13 +92,18 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
             ZoneId defaultZoneId = ZoneId.systemDefault();
 
             Date receivedDate = Date.from(orderList.getOrderReceivedDate().atZone(defaultZoneId).toInstant());
-            orderReceived.setText(date.format(receivedDate));
+            orderDate.setText(date1.format(receivedDate));
+            orderReceived.setText(date2.format(receivedDate));
 
             Date acceptedDate = Date.from(orderList.getOrderAcceptedDate().atZone(defaultZoneId).toInstant());
-            orderReceived.setText(date.format(acceptedDate));
+            orderAccepted.setText(date2.format(acceptedDate));
 
             Date completedDate = Date.from(orderList.getOrderCompletedDate().atZone(defaultZoneId).toInstant());
-            orderReceived.setText(date.format(completedDate));
+            orderCompleted.setText(date2.format(completedDate));
+
+            //프로그래스바 - 수정 필
+            orderProgressBar.setProgress(5);
+            acceptedProgress.setBackgroundResource(R.drawable.progress_circle_main);
 
             //결제금액
             totalCount.setText(orderList.getTotalPrice()+"원");

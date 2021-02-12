@@ -4,13 +4,13 @@
     >
     <item
         android:state_pressed="true"
-        android:color="#AF1212"
+        android:color="@color/mainColor"
         /> <!-- pressed -->
     <item
         android:state_focused="true"
-        android:color="#AF1212"
+        android:color="@color/mainColor"
         /> <!-- focused -->
     <item
-        android:color="#000000"
+        android:color="@color/lightGrey"
         /> <!-- default -->
 </selector>

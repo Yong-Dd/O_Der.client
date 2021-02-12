@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="50dp"
-            android:backgroundTint="@drawable/input_focus"
+            android:backgroundTint="@color/mainColor"
             android:textCursorDrawable="@drawable/cursor"
             android:imeOptions="actionDone"
             android:ems="10"
@@ -68,7 +68,7 @@
             android:hint="비밀번호"
             android:inputType="textPassword"
             android:textSize="20sp"
-            android:backgroundTint="@drawable/input_focus"
+            android:backgroundTint="@color/mainColor"
             android:imeOptions="actionDone"
             android:textCursorDrawable="@drawable/cursor"/>
 
