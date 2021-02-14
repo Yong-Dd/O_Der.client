@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     HomeFragment homeFragment;
@@ -26,8 +28,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout login_success;
     TextView customerName;
 
-    final int REQUEST_CODE = 100;
+
     public static boolean LOGIN_SUCCESS;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +68,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         bottomNavigationView.setSelectedItemId(R.id.homeTab);
 
+        //로그인
         Intent intent = getIntent();
         if(intent!=null){
             Log.d("Result","intent not null");
             logInCheck(intent);
         }
+
+        // firebase
+        mAuth = FirebaseAuth.getInstance();
 
 
     }
@@ -151,5 +158,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //프레그먼트 세팅
             LOGIN_SUCCESS = false;
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        updateUI(currentUser);
     }
 }

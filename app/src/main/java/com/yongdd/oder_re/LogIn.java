@@ -37,7 +37,7 @@ public class LogIn extends Activity implements View.OnClickListener {
         joinButton = findViewById(R.id.joinButton);
         xButton = findViewById(R.id.L_xButton);
         logInButton = findViewById(R.id.loginButton);
-        idText = findViewById(R.id.idText);
+        idText = findViewById(R.id.emailText);
         passwordText = findViewById(R.id.pwText);
 
         mainActivity = new MainActivity();

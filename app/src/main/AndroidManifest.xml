@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yongdd.oder_re">
     <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
@@ -11,17 +11,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.O_Der">
+
         <activity android:name=".MainActivity" android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity android:name=".LogIn" android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".Join" android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".OrderList" />
         <activity android:name=".Stamp" />
+        <activity android:name=".EmailCheck">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="yongdd.page.link/join" android:scheme="http"/>
+                <data android:host="yongdd.page.link/join"  android:scheme="https"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

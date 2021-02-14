@@ -55,7 +55,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="280dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="40dp"
@@ -64,32 +64,41 @@
                     android:paddingBottom="10dp">
 
                     <EditText
-                        android:id="@+id/idText"
-                        android:layout_width="190dp"
+                        android:id="@+id/emailText"
+                        android:layout_width="280dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginRight="10dp"
                         android:backgroundTint="@drawable/input_focus"
                         android:hint="아이디(메일)"
                         android:inputType="textEmailAddress"
                         android:maxLines="1"
+                        android:singleLine="true"
                         android:textCursorDrawable="@drawable/cursor"
                         android:textSize="18sp" />
 
-                    <Button
-                        android:id="@+id/validateButton"
-                        android:layout_width="80dp"
-                        android:layout_height="40dp"
-                        android:layout_gravity="center"
-                        android:background="@color/mainColor"
-                        android:maxLines="1"
-                        android:text="중복 체크"
-                        android:textColor="#ffffff"
-                        android:textSize="15dp"
-                        android:textStyle="bold"
-                        app:backgroundTint="@color/mainColor" />
-
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/emailConfirmText"
+                    android:layout_width="280dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:paddingLeft="5dp"
+                    android:text="이메일 형식이 아닙니다."
+                    android:textColor="@color/mainColor"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/passwordNotice"
+                    android:layout_width="280dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:paddingLeft="5dp"
+                    android:text="비밀번호는 특수 문자, 숫자,영어가 포함되어야하며 8글자 이상이여야합니다."
+                    android:textColor="@color/black"
+                    android:visibility="gone" />
 
                 <EditText
                     android:id="@+id/passwordText"
@@ -100,19 +109,31 @@
                     android:layout_marginBottom="10dp"
                     android:backgroundTint="@drawable/input_focus"
                     android:hint="비밀번호"
+                    android:imeOptions="actionNext"
                     android:inputType="textPassword"
                     android:maxLines="1"
+                    android:singleLine="true"
                     android:textCursorDrawable="@drawable/cursor"
                     android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/passwordValid"
+                    android:layout_width="280dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingLeft="5dp"
+                    android:text="유효하지 않은 비밀번호입니다."
+                    android:textColor="@color/mainColor"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
                     <EditText
-                        android:id="@+id/passwordConfirm"
+                        android:id="@+id/passwordConfirmText"
                         android:layout_width="280dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -122,10 +143,23 @@
                         android:hint="비밀번호 확인"
                         android:inputType="textPassword"
                         android:maxLines="1"
+                        android:nextFocusDown="@id/nameText"
                         android:paddingTop="10dp"
                         android:paddingBottom="10dp"
+                        android:singleLine="true"
                         android:textCursorDrawable="@drawable/cursor"
                         android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/passwordConfirmAnnounce"
+                        android:layout_width="280dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:paddingLeft="5dp"
+                        android:text="*비밀번호가 일치하지 않습니다."
+                        android:textColor="@color/mainColor"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
@@ -140,6 +174,7 @@
                     android:hint="이름"
                     android:inputType="text"
                     android:maxLines="1"
+                    android:singleLine="true"
                     android:textCursorDrawable="@drawable/cursor"
                     android:textSize="18sp" />
 
@@ -152,7 +187,9 @@
                     android:backgroundTint="@drawable/input_focus"
                     android:hint="전화번호"
                     android:inputType="phone"
+                    android:maxLength="13"
                     android:maxLines="1"
+                    android:singleLine="true"
                     android:textCursorDrawable="@drawable/cursor"
                     android:textSize="18sp" />
 
