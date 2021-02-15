@@ -114,13 +114,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(intent!=null){
             Log.d("Result","logIncheck_ intent not null");
             Bundle bundle = intent.getExtras();
-
             if(bundle!=null){
                 Log.d("Result","logIncheck_ bundle not null");
                 String logIn = bundle.getString("logIn");
+                String userName = bundle.getString("userName");
                 if(logIn.equals("true")){
                     Log.d("Result","logIncheck_ logInsetting go");
-                    logInSetting(true,"실험");
+                    logInSetting(true,userName);
                 }else{
                     Log.d("Result","logInCheck log In false");
                 }
@@ -164,6 +164,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-//        updateUI(currentUser);
+
     }
 }

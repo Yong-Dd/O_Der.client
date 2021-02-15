@@ -3,6 +3,7 @@ package com.yongdd.oder_re;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,14 +19,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LogIn extends Activity implements View.OnClickListener {
-    Button joinButton;
+    Button joinButton, logInButton;
     ImageButton xButton;
-    Button logInButton;
-    EditText idText;
-    EditText passwordText;
+    EditText idText, passwordText;
 
+    String TAG = "LOGIN";
     MainActivity mainActivity;
 
     private FirebaseAuth firebaseAuth;
@@ -80,17 +81,28 @@ public class LogIn extends Activity implements View.OnClickListener {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            Log.d("Result","logIn completed");
-                            Intent intent = new Intent(LogIn.this,MainActivity.class);
-                            intent.putExtra("logIn","true");
-                            startActivityForResult(intent,100);
-                            startActivity(intent);
-                            overridePendingTransition(R.anim.page_slide_in_left,R.anim.page_slide_out_right);
+                            Log.d(TAG,"logIn completed");
 
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                            if (user != null) {
+
+                                String name = user.getDisplayName();
+
+                                Intent intent = new Intent(LogIn.this,MainActivity.class);
+                                intent.putExtra("logIn","true");
+                                intent.putExtra("userName",name);
+                                startActivityForResult(intent,100);
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.page_slide_in_left,R.anim.page_slide_out_right);
+
+                            }else{
+                                Log.d(TAG,"doen't have user name");
+                            }
 
 
                         }else{
-                            Log.d("Result","logIn failed");
+                            Log.d(TAG,"logIn failed");
                             Toast.makeText(getApplicationContext(),"아이디와 비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show();
                             return;
                         }

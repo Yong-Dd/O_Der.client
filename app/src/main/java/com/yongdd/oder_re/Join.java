@@ -20,33 +20,31 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class Join extends Activity implements View.OnClickListener, View.OnFocusChangeListener {
-    Button xButton;
-    Button registerButton;
-    EditText emailText;
-    EditText passwordText;
-    EditText passwordConfirmText;
-    EditText nameText;
-    EditText phoneNumText;
-    TextView passwordConfirmAnnounce;
-    TextView emailConfirmText;
-    TextView passwordNotice;
-    TextView passwordValid;
+    Button xButton,registerButton;
+    EditText emailText,passwordText,passwordConfirmText,nameText,phoneNumText;
+    TextView passwordConfirmAnnounce,emailConfirmText,passwordNotice,passwordValid;
 
     boolean passwordCheck;
     static boolean emailCheckCompleted;
@@ -54,7 +52,9 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
 
     private FirebaseAuth mAuth;
     final String TAG = "JOIN";
-    private DatabaseReference mDatabase;
+
+    Long maxId = Long.valueOf(0);
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -91,7 +91,7 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
 
         //파이어베이스 회원가입 관련
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+
     }
 
 
@@ -129,9 +129,9 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
 
                                 addUser(name);
 
-//                                addDB(email,name,phoneNumber);
+                                addDB(email,name,phoneNumber);
 
-                                sendEmailVerification(email);
+//                                sendEmailVerification(email);
 
 
                             } else {
@@ -168,7 +168,7 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
     }*/
 
 
-    private void sendEmailVerification(String email) {
+    /*private void sendEmailVerification(String email) {
         Log.d(TAG, "sendEmailVerification called.");
         final FirebaseUser user = mAuth.getCurrentUser();
 
@@ -178,12 +178,12 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
                         // URL you want to redirect back to. The domain (www.example.com) for this
                         // URL must be whitelisted in the Firebase Console.
                         .setUrl(url)
-                        .setDynamicLinkDomain("https://yongdd.page.link/join")
+                        .setDynamicLinkDomain("https://yongdd.page.link/main")
                         // This must be true
                         .setAndroidPackageName(
                                 "com.yongdd.oder_re",
                                 true,
-                                "30"   )
+                                "16"   )
                         .build();
 
 
@@ -208,6 +208,8 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
                             Toast.makeText(Join.this,
                                     "Verification email sent to " + user.getEmail(),
                                     Toast.LENGTH_SHORT).show();
+                                EmailCheck emailCheck = new EmailCheck();
+                                emailCheck.onDynamicLinkClick();
 
 
                         } else {
@@ -222,7 +224,7 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
                     }
                 });
 
-    }
+    }*/
 
     public void addUser(String name){
 
@@ -249,9 +251,38 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
 
     private void addDB(String email, String name, String phoneNumber){
         Log.d(TAG, "addDB called.");
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users");
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    maxId = (snapshot.getChildrenCount());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         User user = new User(email,name,phoneNumber);
-        mDatabase.child("users").child(email).setValue(user);
-        Log.d(TAG,"addDB완료");
+        database.child(String.valueOf(maxId+1)).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d(TAG,"addDB complete");
+                Toast.makeText(Join.this,"회원가입이 완료되었습니다.",Toast.LENGTH_SHORT);
+                Intent intent = new Intent(Join.this,LogIn.class);
+                intent.putExtra("logIn","true");
+                startActivity(intent);
+                overridePendingTransition(R.anim.page_slide_in_left,R.anim.page_slide_out_right);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG,"addDB failed"+e.toString());
+            }
+        });
+
     }
 
     public static boolean isValidEmail(String email) {
