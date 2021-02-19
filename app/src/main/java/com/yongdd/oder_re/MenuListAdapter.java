@@ -2,6 +2,7 @@ package com.yongdd.oder_re;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +18,15 @@ import static androidx.appcompat.content.res.AppCompatResources.getColorStateLis
 public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.MenuViewHolder> {
     ArrayList<String> menuLists = new ArrayList<>();
     Context context;
-
+    private int mLastClickedPosition = Integer.MIN_VALUE;
     @NonNull
     @Override
     public MenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.menu_list,parent,false);
-
         context = parent.getContext();
+
 
         return new MenuViewHolder(view);
     }
@@ -35,7 +36,8 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.MenuVi
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
         String menu = menuLists.get(position);
-        holder.setItem(menu);
+        holder.setItem(menu,position);
+
     }
 
     @Override
@@ -53,37 +55,59 @@ public class MenuListAdapter extends RecyclerView.Adapter<MenuListAdapter.MenuVi
     }
 
 
-    public class MenuViewHolder extends RecyclerView.ViewHolder{
+
+    public class MenuViewHolder extends RecyclerView.ViewHolder {
         Button menuListName;
-        boolean btnState = false;
 
         public MenuViewHolder(@NonNull View itemView) {
             super(itemView);
             menuListName = itemView.findViewById(R.id.menuListButton);
+            MenuFragment menuFragment = new MenuFragment();
 
             menuListName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    buttonSetting();
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+
+                        toggleButton(position);
+                        menuFragment.menuChoice(position);
+
+                    }
+
                 }
             });
 
         }
-        public void setItem(String menuName){
-           menuListName.setText(menuName);
+
+        public void setItem(String menuName, int position) {
+                menuListName.setText(menuName);
+                menuListName.setTextColor(getColorStateList(context, R.color.menu_list_nofocus_button));
+        }
+
+        public void setItemFirst(String menuName){
+
+            menuListName.setText(menuName);
+            menuListName.setTextColor(getColorStateList(context, R.color.menu_list_focus_button));
 
         }
 
         @SuppressLint("ResourceAsColor")
-        public void buttonSetting(){
-            if(btnState){
-                menuListName.setTextColor(getColorStateList(context,R.color.menu_list_nofocus_button));
-                btnState = false;
+        public void toggleButton(int position) {
 
-            }else if(!btnState){
-                menuListName.setTextColor(getColorStateList(context,R.color.menu_list_focus_button));
-                btnState = true;
+            int lastClickedPosition = mLastClickedPosition;
+            mLastClickedPosition = position;
+
+            if (lastClickedPosition >= 0) {
+                    menuListName.setTextColor(getColorStateList(context, R.color.menu_list_focus_button));
+                    notifyItemChanged(lastClickedPosition);
             }
+
+            if (mLastClickedPosition >= 0) {
+                    menuListName.setTextColor(getColorStateList(context, R.color.menu_list_focus_button));
+
+            }
+
         }
     }
 }

@@ -22,12 +22,14 @@
             android:src="@drawable/strawberry_cake" />
 
         <LinearLayout
+            android:id="@+id/M_menuInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_weight="0.7"
+            android:gravity="center_vertical"
             android:orientation="vertical">
 
             <TextView

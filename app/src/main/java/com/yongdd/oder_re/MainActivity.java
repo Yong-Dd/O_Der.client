@@ -17,6 +17,13 @@ import android.widget.TextView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     HomeFragment homeFragment;
@@ -27,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button loginButton;
     LinearLayout login_success;
     TextView customerName;
+
+    public static ArrayList<Menu> menus;
 
 
     public static boolean LOGIN_SUCCESS;
@@ -49,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginButton.setOnClickListener(this);
 
         LOGIN_SUCCESS = false;
+
+        menus=new ArrayList<>();
 
         //어플 시작시 홈으로 이동
         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,homeFragment).commit();
@@ -77,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // firebase
         mAuth = FirebaseAuth.getInstance();
+
+        getMenuDB();
+
 
 
     }
@@ -165,5 +179,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+    }
+
+    public void getMenuDB(){
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("menus");
+        ref.orderByChild("menuDelimiter").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Menu menu = snapshot.getValue(Menu.class);
+                menus.add(new Menu(Integer.parseInt(snapshot.getKey()),menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
+                        menu.getMenuName(),menu.getMenuPrice()));
+                Log.d("menuDB","size  "+menus.size());
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

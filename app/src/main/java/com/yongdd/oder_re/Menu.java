@@ -2,16 +2,23 @@ package com.yongdd.oder_re;
 
 public class Menu {
     int menuId;
+    int menuDelimiter;
     String menuName;
     int menuPrice;
-    int menuCheckHotIce;
+    int menuHotIce;
     String menuImgPath;
 
-    public Menu(int menuId, String menuName, int menuPrice, int menuCheckHotIce, String menuImgPath) {
+
+    public Menu(){
+
+    }
+
+    public Menu( int menuId, int menuDelimiter, int menuHotIce, String menuImgPath, String menuName, int menuPrice ) {
         this.menuId = menuId;
+        this.menuDelimiter = menuDelimiter;
         this.menuName = menuName;
         this.menuPrice = menuPrice;
-        this.menuCheckHotIce = menuCheckHotIce;
+        this.menuHotIce = menuHotIce;
         this.menuImgPath = menuImgPath;
     }
 
@@ -39,12 +46,12 @@ public class Menu {
         this.menuPrice = menuPrice;
     }
 
-    public int getMenuCheckHotIce() {
-        return menuCheckHotIce;
+    public int getMenuHotIce() {
+        return menuHotIce;
     }
 
-    public void setMenuCheckHotIce(int menuCheckHotIce) {
-        this.menuCheckHotIce = menuCheckHotIce;
+    public void setMenuHotIce(int menuHotIce) {
+        this.menuHotIce = menuHotIce;
     }
 
     public String getMenuImgPath() {
@@ -54,4 +61,12 @@ public class Menu {
     public void setMenuImgPath(String menuImgPath) {
         this.menuImgPath = menuImgPath;
     }
+    public int getMenuDelimiter() {
+        return menuDelimiter;
+    }
+
+    public void setMenuDelimiter(int menuDelimiter) {
+        this.menuDelimiter = menuDelimiter;
+    }
+
 }
