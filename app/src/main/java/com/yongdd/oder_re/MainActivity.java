@@ -103,9 +103,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.menuTab:
                 getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,menuFragment).commit();
                 return true;
-            case R.id.paymentTab:
-                getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
-                return true;
             case R.id.accountTab:
                 getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,accountFragment).commit();
                 return true;

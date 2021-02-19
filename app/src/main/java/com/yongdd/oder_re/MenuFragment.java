@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -33,17 +34,28 @@ public class MenuFragment extends Fragment {
     static FrameLayout menuDetailFragContainer;
     private static Context context;
 
+    static Button orderButton;
+
+    static int orderCount;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.menu_fragment,container,false);
 
         context = view.getContext();
         menus = new ArrayList<>();
         menuDetailFragContainer = view.findViewById(R.id.menuDetailFragContainer);
+        orderButton = view.findViewById(R.id.orderButton);
 
+        //메인화면서 db메뉴 가져옴
         getMenu();
+
+
+
+
 
         //menu List RecyclerView
         RecyclerView menuListRecyclerView = (RecyclerView) view.findViewById(R.id.menuListRecycleview);
@@ -65,6 +77,15 @@ public class MenuFragment extends Fragment {
         menuRecyclerView.setHasFixedSize(true);
         menuRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         allMenuSetting();
+
+        //orderButton clicked
+        orderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PaymentFragment paymentFragment = new PaymentFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
+            }
+        });
 
 
         return view;
@@ -135,6 +156,17 @@ public class MenuFragment extends Fragment {
             menuDetailFragContainer.setAnimation(pageDownAnim);
         }
 
+    }
+
+    public void setOrderButton(boolean order, int count){
+        orderCount +=count;
+
+        if(order){
+            orderButton.setVisibility(View.VISIBLE);
+            orderButton.setText(orderCount+"개");
+        }else{
+            orderButton.setVisibility(View.GONE);
+        }
     }
 
 }

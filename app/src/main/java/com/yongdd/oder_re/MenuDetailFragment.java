@@ -32,6 +32,9 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
     final static DecimalFormat priceFormat = new DecimalFormat("###,###");
 
     static View view;
+
+    MenuFragment menuFragment = new MenuFragment();
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -63,6 +66,8 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         menuAddButton = view.findViewById(R.id.MD_menuAddButton);
         menuAddButton.setOnClickListener(this);
         menuNameText = view.findViewById(R.id.MD_menuNameText);
+
+
 
         return view;
     }
@@ -171,6 +176,8 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
             hotButton.setBackgroundResource(R.drawable.rect);
         }else if(v==menuAddButton){
             orderListAdd(new OrderAddListItem(lastMenuId,lastMenuName,lastTotalPrice,totalCount,lastHotIce));
+            menuFragment.setOrderButton(true,totalCount);
+            menuFragment.menuDetailShow(false);
         }
     }
 
