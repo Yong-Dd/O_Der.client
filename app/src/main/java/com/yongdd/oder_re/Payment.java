@@ -1,14 +1,26 @@
 package com.yongdd.oder_re;
 
 public class Payment {
+    int menuId;
     String menuName;
-    int menuCount;
-    int menuPrice;
+    int menuTotalPrice;
+    int menuTotalCount;
+    String menuHotIce;
 
-    public Payment(String menuName, int menuCount, int menuPrice) {
+    public Payment(int menuId, String menuName, int menuTotalPrice, int menuTotalCount, String menuHotIce) {
+        this.menuId = menuId;
         this.menuName = menuName;
-        this.menuCount = menuCount;
-        this.menuPrice = menuPrice;
+        this.menuTotalPrice = menuTotalPrice;
+        this.menuTotalCount = menuTotalCount;
+        this.menuHotIce = menuHotIce;
+    }
+
+    public int getMenuId() {
+        return menuId;
+    }
+
+    public void setMenuId(int menuId) {
+        this.menuId = menuId;
     }
 
     public String getMenuName() {
@@ -19,19 +31,27 @@ public class Payment {
         this.menuName = menuName;
     }
 
-    public int getMenuCount() {
-        return menuCount;
+    public int getMenuTotalPrice() {
+        return menuTotalPrice;
     }
 
-    public void setMenuCount(int menuCount) {
-        this.menuCount = menuCount;
+    public void setMenuTotalPrice(int menuTotalPrice) {
+        this.menuTotalPrice = menuTotalPrice;
     }
 
-    public int getMenuPrice() {
-        return menuPrice;
+    public int getMenuTotalCount() {
+        return menuTotalCount;
     }
 
-    public void setMenuPrice(int menuPrice) {
-        this.menuPrice = menuPrice;
+    public void setMenuTotalCount(int menuTotalCount) {
+        this.menuTotalCount = menuTotalCount;
+    }
+
+    public String getMenuHotIce() {
+        return menuHotIce;
+    }
+
+    public void setMenuHotIce(String menuHotIce) {
+        this.menuHotIce = menuHotIce;
     }
 }

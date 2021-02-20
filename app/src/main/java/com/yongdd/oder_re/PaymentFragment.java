@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
@@ -20,25 +22,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class PaymentFragment extends Fragment {
+public class PaymentFragment extends Fragment implements View.OnClickListener {
     FrameLayout noLogin;
     FrameLayout emptyPayment;
     RecyclerView choiceMenuRecyclerView;
-    PaymentAdapter paymentAdapter;
+    LinearLayout deleteLayout;
+    static PaymentAdapter paymentAdapter;
     public static ArrayList<Payment> paymentLists;
     boolean logIn;
+    Button paymentButton;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.payment_fragment, container, false);
 
-        Log.d("start111","paymentFragment start");
         noLogin = (FrameLayout)view.findViewById(R.id.P_noLogIn);
         emptyPayment = view.findViewById(R.id.emptyPayment);
-
+        paymentButton = view.findViewById(R.id.paymentButton);
+        //결제 내역 관련
         paymentLists = new ArrayList<>();
+        paymentLists = MenuFragment.orderLists;
 
+
+        //결제 방식
         spinnerSetting(view);
 
         //선택한 주문 목록 리싸이클러뷰
@@ -47,7 +54,9 @@ public class PaymentFragment extends Fragment {
 
         choiceMenuRecyclerView.setHasFixedSize(true);
         choiceMenuRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        choiceMenuRecyclerView.setAdapter(paymentAdapter);
+
+        paymentListSetting();
+
 
         //로그인 체크하여 세팅
         logIn = MainActivity.LOGIN_SUCCESS;
@@ -61,6 +70,7 @@ public class PaymentFragment extends Fragment {
         return view;
     }
 
+    //결제수단
     public void spinnerSetting(View view){
 
         Spinner spinner = (Spinner)view.findViewById(R.id.paymentSpinner);
@@ -86,9 +96,11 @@ public class PaymentFragment extends Fragment {
             noLogin.setVisibility(View.GONE);
         }else{
             noLogin.setVisibility(View.VISIBLE);
+            paymentLists.clear();
         }
     }
 
+    //장바구니 비었을때
     public void emptyCheck(boolean empty){
         if(empty){
             emptyPayment.setVisibility(View.VISIBLE);
@@ -97,23 +109,36 @@ public class PaymentFragment extends Fragment {
         }
     }
 
-    public void paymentListAdd(Payment payment){
 
-        if(payment!=null){
-            paymentLists.add(payment);
-            if (paymentLists.size() >= 1) {
-                emptyCheck(false);
-                paymentAdapter.addItem(payment);
+    public void paymentListSetting(){
 
-                //차후 확인 필요 - 리싸이클러뷰 onCreate아니면 안됐었음.
-                choiceMenuRecyclerView.setAdapter(paymentAdapter);
-                paymentAdapter.notifyDataSetChanged();
-            }else{
-                emptyCheck(true);
+        if(paymentLists.size()>0){
+            emptyCheck(false);
+
+            for(int i=0; i<paymentLists.size(); i++){
+                Payment payment = paymentLists.get(i);
+                if(payment!=null) {
+                    Log.d("PaymentFragment","payment not null "+payment.getMenuName());
+                    paymentAdapter.addItem(payment);
+                    choiceMenuRecyclerView.setAdapter(paymentAdapter);
+                    paymentAdapter.notifyDataSetChanged();
+                    Log.d("PaymentFragment","payment set adapter");
+                }
             }
+
+
         }else{
-            Log.d("payment","paymentListAdd works but payment is null");
+            emptyCheck(true);
         }
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v==paymentButton){
+
+        }
+
 
     }
 }

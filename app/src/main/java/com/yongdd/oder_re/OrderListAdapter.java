@@ -110,8 +110,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
 
             //주문 메뉴 리싸이클러뷰
             PaymentAdapter adapter = new PaymentAdapter();
-            adapter.addItem(new Payment("아메리카노",1,3000));
-            adapter.addItem(new Payment("카페 모카",1,4000));
+
             orderListRecycler.setHasFixedSize(true);
             orderListRecycler.setLayoutManager(new LinearLayoutManager(context));
             orderListRecycler.setAdapter(adapter);

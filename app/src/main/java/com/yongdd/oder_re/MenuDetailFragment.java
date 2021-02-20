@@ -1,8 +1,6 @@
 package com.yongdd.oder_re;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -175,7 +173,7 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
             iceButton.setBackgroundResource(R.drawable.main_button);
             hotButton.setBackgroundResource(R.drawable.rect);
         }else if(v==menuAddButton){
-            orderListAdd(new OrderAddListItem(lastMenuId,lastMenuName,lastTotalPrice,totalCount,lastHotIce));
+            orderListAdd(new Payment(lastMenuId,lastMenuName,lastTotalPrice,totalCount,lastHotIce));
             menuFragment.setOrderButton(true,totalCount);
             menuFragment.menuDetailShow(false);
         }
@@ -188,24 +186,19 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         ArrayList<Integer> countAndPrice = new ArrayList<>();
 
         if(plusCount){
-            Log.d("menuDetailFragment","menu plusButton called");
             totalCount+=1;
             menuCountText.setText(totalCount+"개");
             lastTotalPrice = priceSetting(totalCount);
-            Log.d("menuDetailFragment","totalCount: "+totalCount);
 
         }else{
-            Log.d("menuDetailFragment","menu minusButton called");
             totalCount-=1;
             if(totalCount>=1){
                 menuCountText.setText(totalCount+"개");
                 lastTotalPrice = priceSetting(totalCount);
-                Log.d("menuDetailFragment","totalCount 11: "+totalCount);
             }else{
                 totalCount=1;
                 menuCountText.setText(totalCount+"개");
                 lastTotalPrice = priceSetting(totalCount);
-                Log.d("menuDetailFragment","totalCount: "+totalCount);
             }
         }
 
@@ -233,48 +226,17 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         return hotAndIce;
     }
 
-    public void orderListAdd(OrderAddListItem orderItem){
+    public void orderListAdd(Payment orderItem){
+
         String name = orderItem.getMenuName();
         String hotIce = orderItem.getMenuHotIce();
         int count = orderItem.getMenuTotalCount();
         int price = orderItem.getMenuTotalPrice();
         int id = orderItem.getMenuId();
 
-        Log.d("menuDetailFragment",id+", "+name+", "+hotIce+", "+count+", "+price);
+        Payment payment = new Payment(id,name,price,count,hotIce);
+
+        menuFragment.OrderPlus(payment);
     }
 
-    public static class MenuSet{
-        public String name ;
-        public String hotIce;
-        public int count;
-        public int price;
-        public int id;
-
-        public MenuSet() {
-            name = "";
-            hotIce = "";
-            count = 0;
-            price = 0;
-            id=-1;
-        }
-        public MenuSet(int menuId, String menuName){
-            id = menuId;
-            name = menuName;
-        }
-
-        public MenuSet(String HotIce) {
-
-          if(HotIce=="hot" || HotIce.equals("hot")){
-              hotIce = HotIce;
-          }else if(HotIce=="ice" || HotIce.equals("ice")){
-              hotIce = HotIce;
-          }
-
-        }
-
-        public MenuSet(ArrayList<Integer> countAndPrice) {
-            count = countAndPrice.get(0);
-            price = countAndPrice.get(1);
-        }
-    }
 }

@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -18,17 +17,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 
 public class MenuFragment extends Fragment {
-    static ArrayList<Menu> menus;
+    static ArrayList<Menu> menus; //메뉴 목록
     static RecyclerView menuRecyclerView;
     static MenuAdapter menuAdapter;
     static FrameLayout menuDetailFragContainer;
@@ -37,6 +29,9 @@ public class MenuFragment extends Fragment {
     static Button orderButton;
 
     static int orderCount;
+
+    //주문 목록
+    static ArrayList<Payment> orderLists = new ArrayList<>();
 
 
     @Nullable
@@ -51,10 +46,7 @@ public class MenuFragment extends Fragment {
         orderButton = view.findViewById(R.id.orderButton);
 
         //메인화면서 db메뉴 가져옴
-        getMenu();
-
-
-
+        menus = MainActivity.menus;
 
 
         //menu List RecyclerView
@@ -89,22 +81,6 @@ public class MenuFragment extends Fragment {
 
 
         return view;
-    }
-    public void getMenu(){
-        if(MainActivity.menus.size()>0){
-            for(int i=0; i<MainActivity.menus.size(); i++){
-                Menu menu = MainActivity.menus.get(i);
-                if(menu!=null){
-                    menus.add(menu);
-                    Log.d("menuDB","MenuFragment menus size  "+menus.size());
-                }else{
-                    Log.d("menuDB","MainActivity menus's item null");
-                }
-            }
-        }else{
-            Log.d("menuDB","MainActivity menus size null");
-        }
-
     }
 
     public void menuChoice(int position){
@@ -169,4 +145,17 @@ public class MenuFragment extends Fragment {
         }
     }
 
+    public void OrderPlus(Payment orderItem){
+
+        orderLists.add(orderItem);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(orderCount>0){
+            setOrderButton(true,0);
+        }
+
+    }
 }

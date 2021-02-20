@@ -3,6 +3,8 @@ package com.yongdd.oder_re;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +21,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.PaymentV
     public PaymentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.payment_menu_list,parent,false);
+
         return new PaymentViewHolder(view);
     }
 
@@ -45,23 +48,41 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.PaymentV
     }
 
 
+
     public class PaymentViewHolder extends RecyclerView.ViewHolder{
-        TextView menuName;
-        TextView menuCount;
-        TextView menuPrice;
+        TextView menuName,menuCount, menuPrice;
+        Button itemDeleteButton;
+
 
         public PaymentViewHolder(@NonNull View itemView) {
             super(itemView);
             menuName = itemView.findViewById(R.id.P_menuName);
             menuCount = itemView.findViewById(R.id.P_menuCount);
             menuPrice = itemView.findViewById(R.id.P_menuPrice);
+            itemDeleteButton = itemView.findViewById(R.id.P_ItemDeleteButton);
+            itemDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteItem(getAdapterPosition());
+                }
+            });
+
 
         }
         public void setItem(Payment payment){
             menuName.setText(payment.getMenuName());
-            menuCount.setText(payment.getMenuCount()+"개");
-            menuPrice.setText(payment.getMenuPrice()+"원");
-
+            menuCount.setText(payment.getMenuTotalCount()+"개");
+            menuPrice.setText(payment.getMenuTotalPrice()+"원");
         }
+        public void deleteItem(int position){
+            paymentLists.remove(position);
+            notifyItemRemoved(position);
+//            notifyItemRangeChanged(position,paymentLists.size());
+            if(paymentLists.size()==0){
+                PaymentFragment paymentFragment = new PaymentFragment();
+                paymentFragment.emptyCheck(false);
+            }
+        }
+
     }
 }
