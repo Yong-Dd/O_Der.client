@@ -3,9 +3,13 @@ package com.yongdd.oder_re;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.app.ActivityOptions;
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -28,12 +32,12 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     HomeFragment homeFragment;
     MenuFragment menuFragment;
-    PaymentFragment paymentFragment;
+    static PaymentFragment paymentFragment;
     AccountFragment accountFragment;
 
-    Button loginButton;
-    LinearLayout login_success;
-    TextView customerName;
+    static Button loginButton;
+    static LinearLayout login_success;
+    static TextView customerName;
 
     public static ArrayList<Menu> menus;
 
@@ -79,12 +83,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         bottomNavigationView.setSelectedItemId(R.id.homeTab);
 
-        //로그인
-        Intent intent = getIntent();
-        if(intent!=null){
-            Log.d("Result","intent not null");
-            logInCheck(intent);
-        }
 
         // firebase
         mAuth = FirebaseAuth.getInstance();
@@ -114,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v.equals(loginButton)) {
             Intent intent = new Intent(this,LogIn.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);
             Bundle bundle = ActivityOptions.makeCustomAnimation(this, R.anim.page_slide_in_right, R.anim.page_slide_out_left).toBundle();
             startActivity(intent,bundle);
         }
@@ -144,14 +142,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void logInSetting(boolean login, String name){
-        Log.d("logIn Result","logInsetting called");
         if(login){
-            Log.d("logIn Result","login true");
             //메인페이지 세팅
             if(loginButton!=null){
                 loginButton.setVisibility(View.GONE);
-            }else{
-                Log.d("logIn Result","loginButton is null");
             }
 
             customerName.setText(name);
@@ -159,6 +153,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //프레그먼트 세팅
             LOGIN_SUCCESS = true;
+
+
 
         }else{
             Log.d("logIn Result","login false");
@@ -211,5 +207,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(MenuFragment.orderButtonClicked){
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
+        }
     }
 }

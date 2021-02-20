@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder> {
@@ -71,6 +72,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         ImageView menuImage;
         TextView menuName,menuPrice;
         LinearLayout menuInfo;
+        final DecimalFormat priceFormat = new DecimalFormat("###,###");
 
         public MenuViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -87,7 +89,9 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
             //차후 변경
             menuImage.setImageResource(R.drawable.strawberry_cake);
             menuName.setText(menu.getMenuName());
-            menuPrice.setText(Integer.toString(menu.getMenuPrice()));
+
+            String itemPriceFormat = priceFormat.format(menu.getMenuPrice());
+            menuPrice.setText(itemPriceFormat+"원");
 
         }
 

@@ -118,9 +118,9 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         if(menuPrice>0){
             price = menuPrice;
             lastTotalPrice = menuPrice;
+
             String totalPriceFormat = priceFormat.format(menuPrice);
-            String totalPriceText = totalPriceFormat+"원";
-            menuPriceText.setText(totalPriceText);
+            menuPriceText.setText(totalPriceFormat+"원");
         }else{
             lastTotalPrice=0;
         }

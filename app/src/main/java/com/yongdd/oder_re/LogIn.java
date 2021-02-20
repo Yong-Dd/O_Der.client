@@ -89,15 +89,10 @@ public class LogIn extends Activity implements View.OnClickListener {
 
                                 String name = user.getDisplayName();
 
-                                Intent intent = new Intent(LogIn.this,MainActivity.class);
-                                intent.putExtra("logIn","true");
-                                intent.putExtra("userName",name);
-                                startActivityForResult(intent,100);
-                                startActivity(intent);
+                                finish();
+                                mainActivity.logInSetting(true,name);
                                 overridePendingTransition(R.anim.page_slide_in_left,R.anim.page_slide_out_right);
 
-                            }else{
-                                Log.d(TAG,"doen't have user name");
                             }
 
 

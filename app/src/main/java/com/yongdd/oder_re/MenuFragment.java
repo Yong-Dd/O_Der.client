@@ -1,6 +1,8 @@
 package com.yongdd.oder_re;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ public class MenuFragment extends Fragment {
     static Button orderButton;
 
     static int orderCount;
+    static boolean orderButtonClicked;
 
     //주문 목록
     static ArrayList<Payment> orderLists = new ArrayList<>();
@@ -44,6 +47,7 @@ public class MenuFragment extends Fragment {
         menus = new ArrayList<>();
         menuDetailFragContainer = view.findViewById(R.id.menuDetailFragContainer);
         orderButton = view.findViewById(R.id.orderButton);
+        orderButtonClicked = false;
 
         //메인화면서 db메뉴 가져옴
         menus = MainActivity.menus;
@@ -74,10 +78,28 @@ public class MenuFragment extends Fragment {
         orderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PaymentFragment paymentFragment = new PaymentFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
+                orderButtonClicked = true;
+                if(MainActivity.LOGIN_SUCCESS){
+                    PaymentFragment paymentFragment = new PaymentFragment();
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage("로그인을 먼저 해주세요!")
+                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    return;
+                                }
+                            }).show();
+                }
+
             }
         });
+
+        //orderButton 안 뜨는 것을 방지
+        if(orderCount>0){
+            orderButton.setVisibility(View.VISIBLE);
+        }
 
 
         return view;
@@ -148,6 +170,10 @@ public class MenuFragment extends Fragment {
     public void OrderPlus(Payment orderItem){
 
         orderLists.add(orderItem);
+    }
+
+    public void orderCountMinus(int count){
+        orderCount-=count;
     }
 
     @Override

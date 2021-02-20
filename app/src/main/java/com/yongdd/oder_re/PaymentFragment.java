@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -20,17 +21,21 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PaymentFragment extends Fragment implements View.OnClickListener {
     FrameLayout noLogin;
-    FrameLayout emptyPayment;
+    static FrameLayout emptyPayment;
     RecyclerView choiceMenuRecyclerView;
-    LinearLayout deleteLayout;
     static PaymentAdapter paymentAdapter;
     public static ArrayList<Payment> paymentLists;
     boolean logIn;
-    Button paymentButton;
+    static Button paymentButton;
+//    static int totalPrice;
+    CheckBox stampCheckBox;
+
+    final static DecimalFormat priceFormat = new DecimalFormat("###,###");
 
     @Nullable
     @Override
@@ -40,9 +45,25 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         noLogin = (FrameLayout)view.findViewById(R.id.P_noLogIn);
         emptyPayment = view.findViewById(R.id.emptyPayment);
         paymentButton = view.findViewById(R.id.paymentButton);
+
+        //스탬프 할인 체크
+        stampCheckBox = view.findViewById(R.id.stampCheckBox);
+        stampCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    totalPriceSetting(true);
+                }else{
+                    totalPriceSetting(false);
+                }
+            }
+        });
+
         //결제 내역 관련
         paymentLists = new ArrayList<>();
         paymentLists = MenuFragment.orderLists;
+        Log.d("PaymentFragment","실 선택 사이즈: "+MenuFragment.orderLists.size());
+        Log.d("PaymentFragment","결제 내역 사이즈:"+paymentLists.size());
 
 
         //결제 방식
@@ -66,6 +87,9 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         }else{
             logInSetting(false);
         }
+
+        //총가격 세팅
+//        totalPrice=0;
 
         return view;
     }
@@ -119,12 +143,17 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
                 Payment payment = paymentLists.get(i);
                 if(payment!=null) {
                     Log.d("PaymentFragment","payment not null "+payment.getMenuName());
+
+                    //어뎁터 설정
                     paymentAdapter.addItem(payment);
                     choiceMenuRecyclerView.setAdapter(paymentAdapter);
                     paymentAdapter.notifyDataSetChanged();
+
+
                     Log.d("PaymentFragment","payment set adapter");
                 }
             }
+            totalPriceSetting(false);
 
 
         }else{
@@ -133,12 +162,40 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    public void orderItemDeleted(int position){
+        int beforeSize = paymentLists.size();
+        paymentLists.remove(position);
+        int changedSize = paymentLists.size();
+
+        if(beforeSize>changedSize) {
+            totalPriceSetting(false);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         if(v==paymentButton){
 
         }
+    }
 
+    public void totalPriceSetting(boolean stampChecked){
+        int totalPrice = getTotalPrice(stampChecked);
+        String totalPriceFormat = priceFormat.format(totalPrice);
+        paymentButton.setText(totalPriceFormat+"원 결제하기");
+    }
 
+    public int getTotalPrice(boolean stampChecked){
+        int totalPrice=0;
+
+        for(int i=0; i<paymentLists.size();i++){
+            totalPrice += paymentLists.get(i).getMenuTotalPrice();
+        }
+
+        if(stampChecked){
+            totalPrice-=3000;
+        }
+
+        return totalPrice;
     }
 }
