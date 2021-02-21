@@ -89,7 +89,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.PaymentV
             menuPrice.setText(itemPriceFormat+"원");
         }
         public void checkDeleteItem(int position){
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.dialogChange);
             builder.setMessage("메뉴를 삭제하시겠습니까?")
                     .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                         @Override

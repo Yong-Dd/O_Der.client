@@ -73,7 +73,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         choiceMenuRecyclerView = (RecyclerView)view.findViewById(R.id.choiceMenuList);
         paymentAdapter = new PaymentAdapter();
 
-        choiceMenuRecyclerView.setHasFixedSize(true);
+        choiceMenuRecyclerView.setHasFixedSize(false);
         choiceMenuRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         paymentListSetting();

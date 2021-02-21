@@ -14,7 +14,7 @@
         android:id="@+id/P_noLogIn"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/textView13"
@@ -31,7 +31,7 @@
         android:id="@+id/emptyPayment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/textView4"

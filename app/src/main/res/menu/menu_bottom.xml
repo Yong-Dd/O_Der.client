@@ -18,7 +18,7 @@
         android:id="@+id/accountTab"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_supervisor_account_24"
-        android:title="마이"
+        android:title="MY"
         app:showAsAction="ifRoom" />
 
 </menu>

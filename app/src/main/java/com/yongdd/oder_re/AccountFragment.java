@@ -3,6 +3,7 @@ package com.yongdd.oder_re;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
@@ -15,9 +16,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 
 public class AccountFragment extends Fragment implements View.OnClickListener {
-    Button orderListButton;
-    Button stampButton;
-    Button logOutButton;
+    Button orderListButton, stampButton, logOutButton;
     FrameLayout noLogin;
     boolean logIn;
 
@@ -76,4 +75,10 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
             noLogin.setVisibility(View.VISIBLE);
         }
     }
+
+    public void reloadView(){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.detach(AccountFragment.this).attach(AccountFragment.this).commitAllowingStateLoss() ;
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.yongdd.oder_re;
 
+import android.app.FragmentTransaction;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -44,7 +45,13 @@ public class OrderList extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        AccountFragment accountFragment = new AccountFragment();
+
         finish();
         overridePendingTransition(R.anim.page_slide_in_left, R.anim.page_slide_out_right);
+//        accountFragment.reloadView();
+//        getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,accountFragment)
+//                .setCustomAnimations(R.anim.page_slide_in_left,R.anim.page_slide_out_right).commitAllowingStateLoss() ;
+
     }
 }

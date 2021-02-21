@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static boolean LOGIN_SUCCESS;
     private FirebaseAuth mAuth;
 
+    static boolean accountClicked;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginButton.setOnClickListener(this);
 
         LOGIN_SUCCESS = false;
+//        accountClicked = false;
 
         menus=new ArrayList<>();
 
@@ -102,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,menuFragment).commit();
                 return true;
             case R.id.accountTab:
+                accountClicked = true;
                 getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,accountFragment).commit();
                 return true;
             default:return false;
@@ -117,28 +121,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent,bundle);
         }
 
-    }
-    private void logInCheck(Intent intent){
-        Log.d("Result","logIncheck");
-        if(intent!=null){
-            Log.d("Result","logIncheck_ intent not null");
-            Bundle bundle = intent.getExtras();
-            if(bundle!=null){
-                Log.d("Result","logIncheck_ bundle not null");
-                String logIn = bundle.getString("logIn");
-                String userName = bundle.getString("userName");
-                if(logIn.equals("true")){
-                    Log.d("Result","logIncheck_ logInsetting go");
-                    logInSetting(true,userName);
-                }else{
-                    Log.d("Result","logInCheck log In false");
-                }
-            }else{
-                Log.d("Result","logIncheck_ bundle  null");
-            }
-        }else{
-            Log.d("Result","logIncheck_ intent null");
-        }
     }
 
     public void logInSetting(boolean login, String name){
@@ -212,8 +194,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        if(MenuFragment.orderButtonClicked){
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
+
+        if(accountClicked){
+            accountFragment.reloadView();
+            accountClicked = false;
         }
     }
+
 }
