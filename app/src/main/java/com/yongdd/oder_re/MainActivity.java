@@ -2,12 +2,15 @@ package com.yongdd.oder_re;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     static boolean accountClicked;
 
+    private AlertDialog exitAlertDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginButton.setOnClickListener(this);
 
         LOGIN_SUCCESS = false;
-//        accountClicked = false;
 
         menus=new ArrayList<>();
 
@@ -201,4 +205,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("앱을 종료하시겠습니까?")
+                .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                        finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
+                        android.os.Process.killProcess(android.os.Process.myPid()); // 앱 프로세스 종료
+                    }
+                })
+                .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        exitAlertDialog = builder.create();
+        exitAlertDialog.show();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (exitAlertDialog != null) {
+            exitAlertDialog.dismiss();
+        }
+
+
+    }
 }

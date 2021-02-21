@@ -1,8 +1,10 @@
 package com.yongdd.oder_re;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -80,14 +82,24 @@ public class MenuFragment extends Fragment {
                     PaymentFragment paymentFragment = new PaymentFragment();
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,paymentFragment).commit();
                 }else{
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.dialogChange);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setMessage("로그인을 먼저 해주세요!")
                             .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     return;
                                 }
-                            }).show();
+                            });
+                    final AlertDialog dialog = builder.create();
+
+                    dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface arg0) {
+                            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(175,18,18));
+                        }
+                    });
+
+                    dialog.show();
                 }
 
             }

@@ -1,8 +1,10 @@
 package com.yongdd.oder_re;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +91,7 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.PaymentV
             menuPrice.setText(itemPriceFormat+"원");
         }
         public void checkDeleteItem(int position){
-            AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.dialogChange);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage("메뉴를 삭제하시겠습니까?")
                     .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                         @Override
@@ -102,10 +104,19 @@ public class PaymentAdapter extends RecyclerView.Adapter<PaymentAdapter.PaymentV
                         public void onClick(DialogInterface dialog, int which) {
                             return;
                         }
-                    }).show();
+                    });
+            final AlertDialog dialog = builder.create();
 
-
+            dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface arg0) {
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(175,18,18));
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+                }
+            });
+            dialog.show();
         }
+
         public void deleteItem(int position){
             PaymentFragment paymentFragment = new PaymentFragment();
             MenuFragment menuFragment = new MenuFragment();
