@@ -100,13 +100,14 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
             //프로그래스바 - 수정 필
             if(orderAcceptedTime==""||orderAcceptedTime.equals("")){
                 orderProgressBar.setProgress(0);
-
+                acceptedProgress.setBackgroundResource(R.drawable.progress_circle_grey);
+                completedProgress.setBackgroundResource(R.drawable.progress_circle_grey);
 
 
             }else if(orderCompletedTime=="" || orderCompletedTime.equals("")){
                 orderProgressBar.setProgress(5);
                 acceptedProgress.setBackgroundResource(R.drawable.progress_circle_main);
-
+                completedProgress.setBackgroundResource(R.drawable.progress_circle_grey);
             }else{
                 orderProgressBar.setProgress(10);
                 acceptedProgress.setBackgroundResource(R.drawable.progress_circle_main);

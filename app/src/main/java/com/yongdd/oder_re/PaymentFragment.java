@@ -211,14 +211,6 @@ public class PaymentFragment extends Fragment{
         }
     }
 
-   /* @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public void onClick(View v) {
-        if(v==paymentButton){
-            Log.d(TAG,"paymentButton clicked");
-            updateDB();
-        }
-    }*/
 
     public void totalPriceSetting(boolean stampChecked){
         int totalPrice = getTotalPrice(stampChecked);
