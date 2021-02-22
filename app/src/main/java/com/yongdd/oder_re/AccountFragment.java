@@ -13,11 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,11 +31,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class AccountFragment extends Fragment implements View.OnClickListener {
-    Button orderListButton, stampButton, logOutButton;
+    Button orderListButton, stampButton, logOutButton,nameEditButton,editNameConfirmButton;
     FrameLayout noLogin;
+    static TextView stampCountText, nameText;
+    LinearLayout editNameLayout;
+    EditText editName;
+
     boolean logIn;
-    TextView stampCountText;
     static int lastStampCount;
+
+    MainActivity mainActivity = new MainActivity();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Nullable
     @Override
@@ -42,14 +54,23 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
         logOutButton = view.findViewById(R.id.A_logOutButton);
         noLogin = (FrameLayout) view.findViewById(R.id.A_noLogIn);
         stampCountText = view.findViewById(R.id.A_stampCountText);
+        nameEditButton = view.findViewById(R.id.A_NameEditButton);
+        editNameLayout = view.findViewById(R.id.A_editNameLayout);
+        editName = view.findViewById(R.id.A_editName);
+        editNameConfirmButton = view.findViewById(R.id.A_EditNameConfirmButton);
+        nameText = view.findViewById(R.id.A_Name);
 
         orderListButton.setOnClickListener(this);
         stampButton.setOnClickListener(this);
         logOutButton.setOnClickListener(this);
+        nameEditButton.setOnClickListener(this);
+        editNameConfirmButton.setOnClickListener(this);
 
         //스탬프 세팅
-        getStampCount();
-//        getOrderList();
+        stampSetting(MainActivity.CURRENT_STAMP);
+
+        //이름 세팅
+        nameSetting();
 
         //로그인 전달하여 세팅
         logIn = MainActivity.LOGIN_SUCCESS;
@@ -78,7 +99,21 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
             Bundle bundle = ActivityOptions.makeCustomAnimation(getActivity(), R.anim.page_slide_in_right, R.anim.page_slide_out_left).toBundle();
             startActivity(intent,bundle);
         }else if(v==logOutButton){
-            //추후 작성
+
+            PaymentFragment paymentFragment = new PaymentFragment();
+
+            mainActivity.logInSetting(false,"");
+
+            reloadView();
+        }else if(v==nameEditButton){
+            editNameLayout.setVisibility(View.VISIBLE);
+        }else if(v==editNameConfirmButton){
+            String name = editName.getText().toString();
+            editNameLayout.setVisibility(View.GONE);
+            nameText.setText(name);
+            editName.setText("");
+            mainActivity.logInSetting(true,name);
+
         }
     }
 
@@ -93,21 +128,25 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
 
     public void reloadView(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.detach(AccountFragment.this).attach(AccountFragment.this).commitAllowingStateLoss() ;
+        ft.detach(AccountFragment.this).attach(AccountFragment.this).commitAllowingStateLoss();
+
     }
 
-    public void getStampCount(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String email = user.getEmail();
 
+    public void stampSetting(int stampCount){
+        stampCountText.setText(String.valueOf(stampCount));
+        lastStampCount = stampCount;
+    }
+
+    public void editName(String name){
+        String email = user.getEmail();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("users");
-        ref.orderByChild("userEmail").equalTo(email).addValueEventListener(new ValueEventListener() {
+        ref.orderByChild("userEmail").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot child: snapshot.getChildren()) {
-                    int curretStamp = child.child("userStamp").getValue(Integer.class);
-                    stampSetting(curretStamp);
+                    child.getRef().child("userName").setValue(name);
                 }
             }
 
@@ -116,11 +155,34 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
 
             }
         });
+
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(name)
+                .build();
+        user.updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("account","프로필 업데이트 성공");
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("account","프로필 업데이트 실패 :"+e);
+            }
+        });
     }
 
-    public void stampSetting(int stampCount){
-        stampCountText.setText(String.valueOf(stampCount));
-        lastStampCount = stampCount;
+    private void nameSetting(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String userName = user.getDisplayName();
+        Log.d("account",userName);
+        if(userName!=null){
+            nameText.setText(userName);
+        }
+
     }
 
 }

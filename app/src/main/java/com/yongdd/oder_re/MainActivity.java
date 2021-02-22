@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     static String USER_ID;
+    static int CURRENT_STAMP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getMenuDB();
 
-
+        getStampCount();
 
     }
 
@@ -286,6 +287,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         exitAlertDialog = builder.create();
         exitAlertDialog.show();
 
+    }
+
+    public void getStampCount(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String email = user.getEmail();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("users");
+        ref.orderByChild("userEmail").equalTo(email).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot child: snapshot.getChildren()) {
+                    int curretStamp = child.child("userStamp").getValue(Integer.class);
+                    CURRENT_STAMP = curretStamp;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override

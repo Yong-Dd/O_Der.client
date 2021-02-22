@@ -170,17 +170,46 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/stampFalseLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/textView19"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:text="스탬프의 개수가 부족합니다. "
+                        android:textColor="@color/black"
+                        android:textSize="18sp"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/stampCountText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="(8개)"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/stampTrueLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    tools:visibility="visible">
 
                     <CheckBox
                         android:id="@+id/stampCheckBox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:buttonTint="@color/black"
                         android:text="총 10개 사용하기"
-                        android:textSize="18sp"
-                        android:buttonTint="@color/black"/>
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/textView2"

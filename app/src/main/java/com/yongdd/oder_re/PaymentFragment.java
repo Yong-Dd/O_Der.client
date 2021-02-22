@@ -1,6 +1,5 @@
 package com.yongdd.oder_re;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,11 +14,11 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,14 +33,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,8 +57,10 @@ public class PaymentFragment extends Fragment{
     static Button paymentButton;
     static int dbTotalPrice;
     CheckBox stampCheckBox;
+    LinearLayout stampFalseLayout, stampTrueLayout;
+    TextView stampCountText;
 
-    static int stampCount;
+    static int plusStampCount;
 
     MenuFragment menuFragment = new MenuFragment();
     final static DecimalFormat priceFormat = new DecimalFormat("###,###");
@@ -85,7 +83,7 @@ public class PaymentFragment extends Fragment{
             }
         });
 
-        //스탬프 할인 체크
+        //스탬프 관련
         stampCheckBox = view.findViewById(R.id.stampCheckBox);
         stampCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -97,6 +95,11 @@ public class PaymentFragment extends Fragment{
                 }
             }
         });
+        stampFalseLayout = view.findViewById(R.id.stampFalseLayout);
+        stampTrueLayout = view.findViewById(R.id.stampTrueLayout);
+        stampCountText = view.findViewById(R.id.stampCountText);
+
+        SetStampLayout();
 
         //결제 내역 관련
         paymentLists = new ArrayList<>();
@@ -131,6 +134,18 @@ public class PaymentFragment extends Fragment{
 
 
         return view;
+    }
+
+    private void SetStampLayout(){
+        int stampCount = MainActivity.CURRENT_STAMP;
+        if(stampCount>=10){
+            stampTrueLayout.setVisibility(View.VISIBLE);
+            stampFalseLayout.setVisibility(View.GONE);
+        }else{
+            stampTrueLayout.setVisibility(View.GONE);
+            stampFalseLayout.setVisibility(View.VISIBLE);
+            stampCountText.setText("("+stampCount+"개)");
+        }
     }
 
     //결제수단
@@ -221,7 +236,7 @@ public class PaymentFragment extends Fragment{
         dbTotalPrice = totalPrice;
 
         //stamp count
-        stampCount = stampCount();
+        plusStampCount = plusStampCount();
     }
 
     public int getTotalPrice(boolean stampChecked){
@@ -388,7 +403,7 @@ public class PaymentFragment extends Fragment{
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot child: snapshot.getChildren()) {
                     int curretStamp = child.child("userStamp").getValue(Integer.class);
-                    child.getRef().child("userStamp").setValue(curretStamp+stampCount);
+                    child.getRef().child("userStamp").setValue(curretStamp+ plusStampCount);
                 }
             }
 
@@ -399,7 +414,7 @@ public class PaymentFragment extends Fragment{
         });
 
     }
-    public int stampCount(){
+    public int plusStampCount(){
         int totalMenuCount=0;
         int dessertMenuCount=0;
         for(int i=0; i<paymentLists.size(); i++){
