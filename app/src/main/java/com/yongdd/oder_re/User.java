@@ -4,11 +4,22 @@ public class User {
     String userEmail;
     String userName;
     String userPhoneNumber;
+    int userStamp;
 
-    public User(String userEmail, String userName, String userPhoneNumber) {
+
+    public User(String userEmail, String userName, String userPhoneNumber, int userStamp) {
         this.userEmail = userEmail;
         this.userName = userName;
         this.userPhoneNumber = userPhoneNumber;
+        this.userStamp = userStamp;
+    }
+
+    public int getUserStamp() {
+        return userStamp;
+    }
+
+    public void setUserStamp(int userStamp) {
+        this.userStamp = userStamp;
     }
 
     public String getUserEmail() {

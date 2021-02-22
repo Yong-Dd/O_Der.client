@@ -1,6 +1,7 @@
 package com.yongdd.oder_re;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,17 +15,43 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-public class PaymentFragment extends Fragment implements View.OnClickListener {
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.TreeSet;
+
+public class PaymentFragment extends Fragment{
     FrameLayout noLogin;
     static FrameLayout emptyPayment;
     RecyclerView choiceMenuRecyclerView;
@@ -32,10 +59,16 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
     public static ArrayList<Payment> paymentLists;
     boolean logIn;
     static Button paymentButton;
-//    static int totalPrice;
+    static int dbTotalPrice;
     CheckBox stampCheckBox;
 
+    static int stampCount;
+
+    MenuFragment menuFragment = new MenuFragment();
     final static DecimalFormat priceFormat = new DecimalFormat("###,###");
+
+
+    final String TAG = "paymentFragment";
 
     @Nullable
     @Override
@@ -45,6 +78,12 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         noLogin = (FrameLayout)view.findViewById(R.id.P_noLogIn);
         emptyPayment = view.findViewById(R.id.emptyPayment);
         paymentButton = view.findViewById(R.id.paymentButton);
+        paymentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateDB();
+            }
+        });
 
         //스탬프 할인 체크
         stampCheckBox = view.findViewById(R.id.stampCheckBox);
@@ -89,7 +128,7 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         }
 
         //총가격 세팅
-//        totalPrice=0;
+
 
         return view;
     }
@@ -172,17 +211,25 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+   /* @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onClick(View v) {
         if(v==paymentButton){
-
+            Log.d(TAG,"paymentButton clicked");
+            updateDB();
         }
-    }
+    }*/
 
     public void totalPriceSetting(boolean stampChecked){
         int totalPrice = getTotalPrice(stampChecked);
         String totalPriceFormat = priceFormat.format(totalPrice);
         paymentButton.setText(totalPriceFormat+"원 결제하기");
+
+        //db에 넘길 가격 설정
+        dbTotalPrice = totalPrice;
+
+        //stamp count
+        stampCount = stampCount();
     }
 
     public int getTotalPrice(boolean stampChecked){
@@ -198,4 +245,187 @@ public class PaymentFragment extends Fragment implements View.OnClickListener {
 
         return totalPrice;
     }
+
+    private void updateDB(){
+        Log.d(TAG,"update DB called");
+
+        String userId = MainActivity.USER_ID;
+        String orderDate="";
+        String orderReceivedTime="";
+
+        //시간
+        if(android.os.Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+
+            LocalDateTime now = LocalDateTime.now();
+            ZonedDateTime zonedDateTime = ZonedDateTime.of(now, ZoneId.of("Asia/Seoul"));
+
+            orderDate = String.valueOf(zonedDateTime.toLocalDate());
+
+            orderReceivedTime = zonedDateTime.format(timeFormat);
+//          orderReceivedTime = String.valueOf(zonedDateTime.toLocalTime());
+        }else{
+            Date now = new Date();
+            TimeZone tz = TimeZone.getTimeZone("Asia/Seoul");
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREA);
+            dateFormat.setTimeZone(tz);
+            orderDate = dateFormat.format(now);
+
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.KOREA);
+            timeFormat.setTimeZone(tz);
+            orderReceivedTime = timeFormat.format(now);
+
+        }
+
+
+
+        Order orderList = new Order(userId,paymentLists,dbTotalPrice,orderDate,orderReceivedTime,"","");
+
+        if(orderList!=null){
+            getMaxCount(orderList);
+        }
+    }
+    private void getMaxCount(Order order){
+
+        Log.d(TAG,"getMaxCount called");
+
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("orderList");
+        database.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long maxCount = snapshot.getChildrenCount();
+                getMaxId(maxCount,order);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getMaxId(long maxCount, Order order){
+        Log.d(TAG,"getMaxId called");
+
+        TreeSet<Integer> orderId = new TreeSet<>();
+
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("orderList");
+        database.orderByChild("orderDate").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                orderId.add(Integer.parseInt(snapshot.getKey()));
+
+                Log.d(TAG,"id "+Integer.parseInt(snapshot.getKey()));
+
+                Log.d(TAG,"maxCount "+maxCount);
+
+                if(orderId.size()==maxCount){
+                    Log.d(TAG,"Ids.size == maxCount");
+                    maxId(orderId,order);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
+
+
+    private void maxId(TreeSet<Integer> orderId, Order order){
+
+        Log.d(TAG,"getMaxId called");
+
+        int maxId = orderId.last();
+        Log.d(TAG,"max second id :"+maxId);
+        if(maxId>=0){
+            addDB(maxId,order);
+        }
+    }
+
+    private void addDB(int maxId,Order order){
+
+        Log.d(TAG,"addDB called");
+
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("orderList");
+        database.child(String.valueOf(maxId + 1)).setValue(order).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "addDB complete");
+                    stampPlus();
+                    clearOrder();
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,menuFragment).commit();
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "addDB failed" + e.toString());
+                Toast.makeText(getContext(), "회원등록에 실패하였습니다.", Toast.LENGTH_SHORT);
+            }
+        });
+
+    }
+    public void clearOrder(){
+        paymentLists.clear();
+        menuFragment.orderLists.clear();
+        menuFragment.setOrderButton(false,0);
+    }
+
+    public void stampPlus(){
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String email = user.getEmail();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("users");
+        ref.orderByChild("userEmail").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot child: snapshot.getChildren()) {
+                    int curretStamp = child.child("userStamp").getValue(Integer.class);
+                    child.getRef().child("userStamp").setValue(curretStamp+stampCount);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+    public int stampCount(){
+        int totalMenuCount=0;
+        int dessertMenuCount=0;
+        for(int i=0; i<paymentLists.size(); i++){
+            int count = paymentLists.get(i).getMenuTotalCount();
+            int menuDelimiter = paymentLists.get(i).getMenuDelimiter();
+
+            totalMenuCount += count;
+
+            if(menuDelimiter==5){
+                dessertMenuCount+=count;
+            }
+        }
+        int plusStamp = totalMenuCount-dessertMenuCount;
+
+        if(plusStamp<0){
+            plusStamp=0;
+        }
+        return plusStamp;
+    }
+
 }

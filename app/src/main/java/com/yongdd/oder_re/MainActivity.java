@@ -29,6 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -52,6 +53,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private AlertDialog exitAlertDialog;
 
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    static String USER_ID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LOGIN_SUCCESS = false;
 
         menus=new ArrayList<>();
+
+        USER_ID = "-1";
 
         //어플 시작시 홈으로 이동
         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,homeFragment).commit();
@@ -140,6 +147,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //프레그먼트 세팅
             LOGIN_SUCCESS = true;
 
+            //User Id setting
+            getUserId();
+
 
 
         }else{
@@ -161,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void getMenuDB(){
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("menus");
         ref.orderByChild("menuDelimiter").addChildEventListener(new ChildEventListener() {
             @Override
@@ -170,6 +179,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 menus.add(new Menu(Integer.parseInt(snapshot.getKey()),menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
                         menu.getMenuName(),menu.getMenuPrice()));
                 Log.d("menuDB","size  "+menus.size());
+                Log.d("menuDB","id  "+snapshot.getKey());
+
 
             }
 
@@ -193,6 +204,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+    }
+
+    public void getUserId(){
+        Log.d("userId","userid start: "+USER_ID);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user!=null){
+            String email = user.getEmail();
+            Log.d("userId","userid user not null: "+USER_ID);
+            if(email!=null||email.equals("")){
+                Log.d("userId","userid user email not null: "+USER_ID);
+                Log.d("userId","userid user email not null email: "+email);
+//                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference ref = database.getReference("users");
+                ref.orderByChild("userEmail").equalTo(email).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                        USER_ID = snapshot.getKey();
+                        Log.d("userId","userid end: "+USER_ID);
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                        USER_ID = snapshot.getKey();
+                        Log.d("userId","userid end changed: "+USER_ID);
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.d("userId","userid error: "+error);
+                    }
+                });
+            }else{
+                Log.d("Main","getUserId__email null");
+            }
+        }else{
+            Log.d("Main","getUserId__Login user null");
+        }
+
     }
 
     @Override

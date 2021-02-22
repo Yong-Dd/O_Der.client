@@ -173,6 +173,7 @@ public class MenuFragment extends Fragment {
             orderButton.setText(orderCount+"개");
         }else{
             orderButton.setVisibility(View.GONE);
+            orderCount=0;
         }
     }
 

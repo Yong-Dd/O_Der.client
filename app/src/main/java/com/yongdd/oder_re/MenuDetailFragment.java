@@ -26,6 +26,7 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
     static String lastMenuName;
     static int lastMenuId;
     static String lastHotIce;
+    static int menuDelimiter;
 
     final static DecimalFormat priceFormat = new DecimalFormat("###,###");
 
@@ -73,6 +74,7 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
 
         //해당 menu content
         int menuId = menu.getMenuId();
+        menuDelimiter = menu.getMenuDelimiter();
         String menuName = menu.getMenuName();
         String menuImgPath = menu.getMenuImgPath();
         int hotIce = menu.getMenuHotIce();
@@ -173,7 +175,7 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
             iceButton.setBackgroundResource(R.drawable.main_button);
             hotButton.setBackgroundResource(R.drawable.rect);
         }else if(v==menuAddButton){
-            orderListAdd(new Payment(lastMenuId,lastMenuName,lastTotalPrice,totalCount,lastHotIce));
+            orderListAdd(new Payment(lastMenuId,menuDelimiter,lastMenuName,lastTotalPrice,totalCount,lastHotIce));
             menuFragment.setOrderButton(true,totalCount);
             menuFragment.menuDetailShow(false);
         }
@@ -233,8 +235,9 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         int count = orderItem.getMenuTotalCount();
         int price = orderItem.getMenuTotalPrice();
         int id = orderItem.getMenuId();
+        int delimiter = orderItem.getMenuDelimiter();
 
-        Payment payment = new Payment(id,name,price,count,hotIce);
+        Payment payment = new Payment(id,delimiter,name,price,count,hotIce);
 
         menuFragment.OrderPlus(payment);
     }

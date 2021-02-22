@@ -2,17 +2,29 @@ package com.yongdd.oder_re;
 
 public class Payment {
     int menuId;
+    int menuDelimiter;
     String menuName;
     int menuTotalPrice;
     int menuTotalCount;
     String menuHotIce;
 
-    public Payment(int menuId, String menuName, int menuTotalPrice, int menuTotalCount, String menuHotIce) {
+    public Payment(){}
+
+    public Payment(int menuId, int menuDelimiter, String menuName, int menuTotalPrice, int menuTotalCount, String menuHotIce) {
         this.menuId = menuId;
+        this.menuDelimiter = menuDelimiter;
         this.menuName = menuName;
         this.menuTotalPrice = menuTotalPrice;
         this.menuTotalCount = menuTotalCount;
         this.menuHotIce = menuHotIce;
+    }
+
+    public int getMenuDelimiter() {
+        return menuDelimiter;
+    }
+
+    public void setMenuDelimiter(int menuDelimiter) {
+        this.menuDelimiter = menuDelimiter;
     }
 
     public int getMenuId() {

@@ -14,11 +14,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class AccountFragment extends Fragment implements View.OnClickListener {
     Button orderListButton, stampButton, logOutButton;
     FrameLayout noLogin;
     boolean logIn;
+    TextView stampCountText;
+    static int lastStampCount;
 
     @Nullable
     @Override
@@ -30,11 +41,15 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
         stampButton = view.findViewById(R.id.A_stampButton);
         logOutButton = view.findViewById(R.id.A_logOutButton);
         noLogin = (FrameLayout) view.findViewById(R.id.A_noLogIn);
+        stampCountText = view.findViewById(R.id.A_stampCountText);
 
         orderListButton.setOnClickListener(this);
         stampButton.setOnClickListener(this);
         logOutButton.setOnClickListener(this);
 
+        //스탬프 세팅
+        getStampCount();
+//        getOrderList();
 
         //로그인 전달하여 세팅
         logIn = MainActivity.LOGIN_SUCCESS;
@@ -79,6 +94,33 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
     public void reloadView(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(AccountFragment.this).attach(AccountFragment.this).commitAllowingStateLoss() ;
+    }
+
+    public void getStampCount(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String email = user.getEmail();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("users");
+        ref.orderByChild("userEmail").equalTo(email).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot child: snapshot.getChildren()) {
+                    int curretStamp = child.child("userStamp").getValue(Integer.class);
+                    stampSetting(curretStamp);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void stampSetting(int stampCount){
+        stampCountText.setText(String.valueOf(stampCount));
+        lastStampCount = stampCount;
     }
 
 }

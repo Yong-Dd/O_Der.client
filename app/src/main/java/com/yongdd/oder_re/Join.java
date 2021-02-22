@@ -1,15 +1,11 @@
 package com.yongdd.oder_re;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,21 +18,18 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,9 +45,6 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
 
     private FirebaseAuth mAuth;
     final String TAG = "JOIN";
-
-    Long maxId = Long.valueOf(0);
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -115,24 +105,108 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
     private void createAccount(){
 
         if(wholeCheck()) {
+            //가입 내용 가져오기
             String email = emailText.getText().toString().trim();
             String password = passwordText.getText().toString().trim();
             String name = nameText.getText().toString().trim();
             String phoneNumber = phoneNumText.getText().toString().trim();
 
-            mAuth.createUserWithEmailAndPassword(email, password)
+            //등록 위한 세팅
+            User user = new User(email, name, phoneNumber,0);
+
+            //db 등록 위한 maxCount가져오기
+            DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users");
+            database.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    long maxCount = snapshot.getChildrenCount();
+                    getMaxId(maxCount,user,password);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+        }else{
+            Log.d(TAG,"확인 안된 부분이 있음");
+        }
+    }
+
+    private void getMaxId(long maxCount,User user,String password){
+        TreeSet<Integer> Ids = new TreeSet<>();
+
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users");
+        database.orderByChild("userName").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Ids.add(Integer.parseInt(snapshot.getKey()));
+
+                Log.d(TAG,"id "+Integer.parseInt(snapshot.getKey()));
+
+                Log.d(TAG,"maxCount "+maxCount);
+
+                if(Ids.size()==maxCount){
+                    Log.d(TAG,"Ids.size == maxCount");
+                    maxId(Ids,user,password);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
+
+
+    private void maxId(TreeSet<Integer> ids,User user,String password){
+        int maxId = ids.last();
+        Log.d(TAG,"max second id :"+maxId);
+        if(maxId>0){
+            addDB(maxId,user,password);
+        }
+    }
+
+    private void addDB(int maxId,User user,String password){
+
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users");
+        database.child(String.valueOf(maxId + 1)).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "addDB complete");
+                        addAuthUser(user, password);
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "addDB failed" + e.toString());
+                    Toast.makeText(Join.this, "회원등록에 실패하였습니다.", Toast.LENGTH_SHORT);
+                }
+            });
+
+    }
+    private void addAuthUser(User user, String password){
+         mAuth.createUserWithEmailAndPassword(user.getUserEmail(),password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "createUserWithEmail:success");
 
-                                addUser(name);
-
-                                addDB(email,name,phoneNumber);
-
-//                                sendEmailVerification(email);
-
+                                addUserName(user.getUserName());
 
                             } else {
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -142,92 +216,10 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
 
                         }
                     });
-        }else{
-            Log.d(TAG,"확인 안된 부분이 있음");
-        }
+
     }
-/*    public void buildActionCodeSettings() {
 
-        FirebaseUser user = mAuth.getCurrentUser();
-        String url = "https://yongdd.page.link/join";
-        ActionCodeSettings actionCodeSettings =
-                ActionCodeSettings.newBuilder()
-                        // URL you want to redirect back to. The domain (www.example.com) for this
-                        // URL must be whitelisted in the Firebase Console.
-                        .setUrl(url)
-                        // This must be true
-                        .setHandleCodeInApp(true)
-                        .setIOSBundleId("com.yongdd.order_re")
-                        .setAndroidPackageName(
-                                "com.example.android",
-                                true, *//* installIfNotAvailable *//*
-                                "12"    *//* minimumVersion *//*)
-                        .build();
-
-
-    }*/
-
-
-    /*private void sendEmailVerification(String email) {
-        Log.d(TAG, "sendEmailVerification called.");
-        final FirebaseUser user = mAuth.getCurrentUser();
-
-        String url = "https://oder-e6555.firebaseapp.com";
-        ActionCodeSettings actionCodeSettings =
-                ActionCodeSettings.newBuilder()
-                        // URL you want to redirect back to. The domain (www.example.com) for this
-                        // URL must be whitelisted in the Firebase Console.
-                        .setUrl(url)
-                        .setDynamicLinkDomain("https://yongdd.page.link/main")
-                        // This must be true
-                        .setAndroidPackageName(
-                                "com.yongdd.oder_re",
-                                true,
-                                "16"   )
-                        .build();
-
-
-//        FirebaseAuth auth = FirebaseAuth.getInstance();
-//        auth.sendSignInLinkToEmail(email, actionCodeSettings)
-//                .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        if (task.isSuccessful()) {
-//                            Log.d(TAG, "Email sent.");
-//                        }else{
-//                            Log.d(TAG, "Email doesn't sent."+task.getException());
-//                        }
-//                    }
-//                });
-        user.sendEmailVerification(actionCodeSettings)
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-
-                        if (task.isSuccessful()) {
-                            Toast.makeText(Join.this,
-                                    "Verification email sent to " + user.getEmail(),
-                                    Toast.LENGTH_SHORT).show();
-                                EmailCheck emailCheck = new EmailCheck();
-                                emailCheck.onDynamicLinkClick();
-
-
-                        } else {
-                            Log.e(TAG, "sendEmailVerification", task.getException());
-                            Toast.makeText(Join.this,
-                                    "Failed to send verification email.",
-                                    Toast.LENGTH_SHORT).show();
-
-
-                        }
-
-                    }
-                });
-
-    }*/
-
-    public void addUser(String name){
-
+    public void addUserName(String name){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(name)
@@ -239,50 +231,17 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "User profile updated.");
-
-                        }else{
-
+                            Toast.makeText(getApplicationContext(),"회원가입이 완료되었습니다.",Toast.LENGTH_SHORT);
+                            onBackPressed();
                         }
                     }
-                });
-
-
-    }
-
-    private void addDB(String email, String name, String phoneNumber){
-        Log.d(TAG, "addDB called.");
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users");
-        database.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    maxId = (snapshot.getChildrenCount());
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        User user = new User(email,name,phoneNumber);
-        database.child(String.valueOf(maxId+1)).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Log.d(TAG,"addDB complete");
-                Toast.makeText(Join.this,"회원가입이 완료되었습니다.",Toast.LENGTH_SHORT);
-                Intent intent = new Intent(Join.this,LogIn.class);
-                intent.putExtra("logIn","true");
-                startActivity(intent);
-                overridePendingTransition(R.anim.page_slide_in_left,R.anim.page_slide_out_right);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
+                }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.d(TAG,"addDB failed"+e.toString());
+                Log.d(TAG,"error :" +e);
+                Toast.makeText(Join.this,"회원등록에 실패하였습니다.",Toast.LENGTH_SHORT);
             }
         });
-
     }
 
     public static boolean isValidEmail(String email) {
@@ -496,6 +455,85 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
         }
         return false;
    }
+/*    public void buildActionCodeSettings() {
+
+        FirebaseUser user = mAuth.getCurrentUser();
+        String url = "https://yongdd.page.link/join";
+        ActionCodeSettings actionCodeSettings =
+                ActionCodeSettings.newBuilder()
+                        // URL you want to redirect back to. The domain (www.example.com) for this
+                        // URL must be whitelisted in the Firebase Console.
+                        .setUrl(url)
+                        // This must be true
+                        .setHandleCodeInApp(true)
+                        .setIOSBundleId("com.yongdd.order_re")
+                        .setAndroidPackageName(
+                                "com.example.android",
+                                true, *//* installIfNotAvailable *//*
+                                "12"    *//* minimumVersion *//*)
+                        .build();
+
+
+    }*/
+
+
+    /*private void sendEmailVerification(String email) {
+        Log.d(TAG, "sendEmailVerification called.");
+        final FirebaseUser user = mAuth.getCurrentUser();
+
+        String url = "https://oder-e6555.firebaseapp.com";
+        ActionCodeSettings actionCodeSettings =
+                ActionCodeSettings.newBuilder()
+                        // URL you want to redirect back to. The domain (www.example.com) for this
+                        // URL must be whitelisted in the Firebase Console.
+                        .setUrl(url)
+                        .setDynamicLinkDomain("https://yongdd.page.link/main")
+                        // This must be true
+                        .setAndroidPackageName(
+                                "com.yongdd.oder_re",
+                                true,
+                                "16"   )
+                        .build();
+
+
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        auth.sendSignInLinkToEmail(email, actionCodeSettings)
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//                            Log.d(TAG, "Email sent.");
+//                        }else{
+//                            Log.d(TAG, "Email doesn't sent."+task.getException());
+//                        }
+//                    }
+//                });
+        user.sendEmailVerification(actionCodeSettings)
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+                            Toast.makeText(Join.this,
+                                    "Verification email sent to " + user.getEmail(),
+                                    Toast.LENGTH_SHORT).show();
+                                EmailCheck emailCheck = new EmailCheck();
+                                emailCheck.onDynamicLinkClick();
+
+
+                        } else {
+                            Log.e(TAG, "sendEmailVerification", task.getException());
+                            Toast.makeText(Join.this,
+                                    "Failed to send verification email.",
+                                    Toast.LENGTH_SHORT).show();
+
+
+                        }
+
+                    }
+                });
+
+    }*/
 
 
 
