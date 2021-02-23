@@ -3,7 +3,9 @@ package com.yongdd.oder_re;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,11 +21,17 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder> {
-    ArrayList<Menu> menus = new ArrayList<>();
+    ArrayList<MenuUri> menus = new ArrayList<>();
     Context context;
     MenuDetailFragment menuDetailFragment;
     FragmentManager fragmentManager;
@@ -45,8 +54,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
-        Menu menu = menus.get(position);
-        holder.setItem(menu);
+        MenuUri menuUri = menus.get(position);
+        holder.setItem(menuUri);
     }
 
     @Override
@@ -55,11 +64,11 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
     }
 
 
-    public void addItem(Menu menu){
-        menus.add(menu);
+    public void addItem(MenuUri menuUri){
+        menus.add(menuUri);
     }
 
-    public Menu getItem(int position){
+    public MenuUri getItem(int position){
         return menus.get(position);
     }
 
@@ -85,11 +94,21 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
             menuInfo.setOnClickListener(this);
 
         }
-        public void setItem(Menu menu){
-            //차후 변경
-            menuImage.setImageResource(R.drawable.strawberry_cake);
+        public void setItem(MenuUri menuUri){
+            Menu menu = menuUri.getMenu();
+            Uri uri = menuUri.getUri();
+
+            //이미지 설정
+            if(uri!=null){
+                Glide.with(context).load(menuUri.getUri()).into((ImageView) menuImage);
+            }else{
+                menuImage.setImageResource(R.drawable.standard_img);
+            }
+
+            //이미지 이름 설정
             menuName.setText(menu.getMenuName());
 
+            //가격 설정
             String itemPriceFormat = priceFormat.format(menu.getMenuPrice());
             menuPrice.setText(itemPriceFormat+"원");
 
@@ -99,10 +118,28 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         public void onClick(View v) {
             if(v==menuImage || v==menuInfo){
               int position = getAdapterPosition();
-              Menu menu = menus.get(position);
-              MenuDetailFragment.setItem(menu);
+              MenuUri menuUri = menus.get(position);
+              MenuDetailFragment.setItem(menuUri);
               MenuFragment.menuDetailShow(true);
             }
         }
     }
+
+  /*  public void setImage(String imgPath,ImageView menuImage){
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://oder-e6555.appspot.com");
+        StorageReference storageRef = storage.getReference();
+        storageRef.child(imgPath).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Log.d("menuAdapter","uri"+uri);
+                Glide.with(context).load(uri).into((ImageView) menuImage);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                menuImage.setImageResource(R.drawable.standard_img);
+            }
+        });
+    }*/
+
 }

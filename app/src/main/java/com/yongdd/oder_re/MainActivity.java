@@ -12,15 +12,20 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,6 +35,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -43,11 +50,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static LinearLayout login_success;
     static TextView customerName;
 
-    public static ArrayList<Menu> menus;
+    public static ArrayList<MenuUri> menus;
 
 
     public static boolean LOGIN_SUCCESS;
-    private FirebaseAuth mAuth;
 
     static boolean accountClicked;
 
@@ -57,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     static String USER_ID;
     static int CURRENT_STAMP;
+
+    static ArrayList<Banner> banners;
+    static ArrayList<Uri> uris;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +89,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         USER_ID = "-1";
 
-        //어플 시작시 홈으로 이동
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,homeFragment).commit();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -98,13 +105,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         bottomNavigationView.setSelectedItemId(R.id.homeTab);
 
+        //homeFragment banner setting
+        Intent intent = getIntent();
+        if(intent!=null){
+            banners = intent.getParcelableArrayListExtra("banner");
+            uris = intent.getParcelableArrayListExtra("uri");
+            Log.d("Banner","main banner size: "+banners.size());
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,homeFragment).commit();
+        }
 
-        // firebase
-        mAuth = FirebaseAuth.getInstance();
 
+        // 메뉴 가져오기
         getMenuDB();
 
-        getStampCount();
+
 
     }
 
@@ -150,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             //User Id setting
             getUserId();
-
+            getStampCount();
 
 
         }else{
@@ -164,12 +178,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-    }
 
     public void getMenuDB(){
         DatabaseReference ref = database.getReference("menus");
@@ -177,8 +185,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Menu menu = snapshot.getValue(Menu.class);
-                menus.add(new Menu(Integer.parseInt(snapshot.getKey()),menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
-                        menu.getMenuName(),menu.getMenuPrice()));
+                getMenuImgUri(menu,Integer.parseInt(snapshot.getKey()));
+
                 Log.d("menuDB","size  "+menus.size());
                 Log.d("menuDB","id  "+snapshot.getKey());
 
@@ -203,6 +211,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+    }
+
+    public void getMenuImgUri(Menu menu,int menuId){
+
+        String imgPath = menu.getMenuImgPath();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://oder-e6555.appspot.com");
+        StorageReference storageRef = storage.getReference();
+        storageRef.child(imgPath).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                menus.add(new MenuUri(new Menu(menuId,menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
+                        menu.getMenuName(),menu.getMenuPrice()),uri));
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                menus.add(new MenuUri(new Menu(menuId,menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
+                        menu.getMenuName(),menu.getMenuPrice()),null));
             }
         });
     }
@@ -292,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void getStampCount(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String email = user.getEmail();
+        Log.d("stamp","email:"+email);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("users");

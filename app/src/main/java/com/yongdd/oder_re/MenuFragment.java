@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class MenuFragment extends Fragment {
-    static ArrayList<Menu> menus; //메뉴 목록
+    static ArrayList<MenuUri> menus; //메뉴 목록
     static RecyclerView menuRecyclerView;
     static MenuAdapter menuAdapter;
     static FrameLayout menuDetailFragContainer;
@@ -117,8 +117,8 @@ public class MenuFragment extends Fragment {
     public void menuChoice(int position){
         menuAdapter.clearItem();
        for(int i=0; i<menus.size(); i++){
-           Menu menu = menus.get(i);
-           int delimiter = menus.get(i).getMenuDelimiter();
+           MenuUri menu = menus.get(i);
+           int delimiter = menus.get(i).getMenu().getMenuDelimiter();
            if((position+1) == delimiter){
                if(menu!=null){
                    menuAdapter.addItem(menu);
@@ -136,7 +136,7 @@ public class MenuFragment extends Fragment {
 
     public void allMenuSetting(){
         for(int i=0; i<menus.size(); i++) {
-            Menu menu = menus.get(i);
+            MenuUri menu = menus.get(i);
             if (menu != null) {
                 menuAdapter.addItem(menu);
                 menuRecyclerView.setAdapter(menuAdapter);

@@ -1,16 +1,21 @@
 package com.yongdd.oder_re;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,6 +24,7 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
     static Button xButton, minusButton, plusButton, menuAddButton ,hotButton, iceButton;
     static LinearLayout hotAndIce, hot, ice;
     static TextView menuCountText, menuPriceText, menuNameText;
+    static ImageView menuImage;
 
     static int lastTotalPrice;
     static int price;
@@ -27,6 +33,8 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
     static int lastMenuId;
     static String lastHotIce;
     static int menuDelimiter;
+
+    static Context context;
 
     final static DecimalFormat priceFormat = new DecimalFormat("###,###");
 
@@ -39,6 +47,7 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.menu_detail_fragment, container, false);
 
+        context= view.getContext();
 
         //hot ice setting
         hotAndIce = view.findViewById(R.id.hotAndIce);
@@ -65,14 +74,18 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         menuAddButton = view.findViewById(R.id.MD_menuAddButton);
         menuAddButton.setOnClickListener(this);
         menuNameText = view.findViewById(R.id.MD_menuNameText);
+        menuImage = view.findViewById(R.id.MD_menuImage);
 
 
 
         return view;
     }
-    public static void setItem(Menu menu){
+    public static void setItem(MenuUri menuUri){
+
+        Menu menu = menuUri.getMenu();
 
         //해당 menu content
+        Uri uri = menuUri.getUri();
         int menuId = menu.getMenuId();
         menuDelimiter = menu.getMenuDelimiter();
         String menuName = menu.getMenuName();
@@ -81,8 +94,10 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         int menuPrice = menu.getMenuPrice();
 
         //이미지 설정
-        if(menuImgPath!=null){
-
+        if(uri!=null){
+            Glide.with(context).load(uri).into((ImageView) menuImage);
+        }else{
+            menuImage.setImageResource(R.drawable.standard_img);
         }
 
         //count 설정

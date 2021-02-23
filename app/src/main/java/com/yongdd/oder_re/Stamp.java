@@ -1,5 +1,6 @@
 package com.yongdd.oder_re;
 
+import android.graphics.ColorSpace;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -71,7 +72,7 @@ public class Stamp extends AppCompatActivity {
                    s9.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
                    break;
                case 10:
-                   s10.setColorFilter(getResources().getColor(R.color.red), android.graphics.PorterDuff.Mode.MULTIPLY);
+                   s10.setColorFilter(getResources().getColor(R.color.mainColor), android.graphics.PorterDuff.Mode.MULTIPLY);
                    break;
 
            }

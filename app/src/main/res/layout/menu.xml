@@ -19,7 +19,7 @@
             android:layout_width="150dp"
             android:layout_height="100dp"
             android:layout_weight="0.3"
-            android:src="@drawable/strawberry_cake" />
+            android:src="@drawable/standard_img" />
 
         <LinearLayout
             android:id="@+id/M_menuInfo"

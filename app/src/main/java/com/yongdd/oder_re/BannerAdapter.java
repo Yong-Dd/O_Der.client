@@ -1,5 +1,8 @@
 package com.yongdd.oder_re;
 
+import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,22 +13,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
-    ArrayList<Banner> banners = new ArrayList<>();
+    ArrayList<BannerUri> banners = new ArrayList<>();
+    Context context;
 
     @NonNull
     @Override
     public BannerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.main_banner,parent,false);
+
+        context = view.getContext();
+
         return new BannerViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull BannerViewHolder holder, int position) {
-        Banner banner = banners.get(position);
+        BannerUri banner = banners.get(position);
         holder.setItem(banner);
     }
 
@@ -35,11 +44,11 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
     }
 
 
-    public void addItem(Banner banner){
+    public void addItem(BannerUri banner){
         banners.add(banner);
     }
 
-    public Banner getItem(int position){
+    public BannerUri getItem(int position){
         return banners.get(position);
     }
 
@@ -48,7 +57,6 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
         TextView menuTitle;
         TextView menuName;
         TextView menuDesc;
-        Button menuGo;
         ImageView menuImg;
 
         public BannerViewHolder(@NonNull View itemView) {
@@ -56,11 +64,13 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
             menuTitle = itemView.findViewById(R.id.banner_Title);
             menuName = itemView.findViewById(R.id.banner_MenuName);
             menuDesc = itemView.findViewById(R.id.banner_MenuDesc);
-            menuGo = itemView.findViewById(R.id.banner_menuGo);
             menuImg = itemView.findViewById(R.id.banner_img);
 
         }
-        public void setItem(Banner banner){
+        public void setItem(BannerUri bannerUri){
+            Banner banner = bannerUri.getBanner();
+            Log.d("Banner","banner null?"+banner==null?null:"not null");
+
             String bannerTitleName = banner.getTitleName();
             String bannerMenuName = banner.getMenuName();
             String bannerMenuDesc = banner.getMenuDesc();
@@ -70,15 +80,17 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
             menuTitle.setText(bannerTitleName);
             menuName.setText(bannerMenuName);
             menuDesc.setText(bannerMenuDesc);
-            menuGo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //프래그먼트 이동
-                }
-            });
-            //차후 이미지 glide 등으로 대체
-            menuImg.setImageResource(R.drawable.strawberry_cake);
 
+
+            Uri uri = bannerUri.getUri();
+
+
+            //차후 이미지 glide 등으로 대체
+            if(uri!=null) {
+                Glide.with(context).load(uri).into((ImageView) menuImg);
+            }else{
+                menuImg.setImageResource(R.drawable.standard_img);
+            }
 
 
         }

@@ -2,6 +2,9 @@ package com.yongdd.oder_re;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,11 +12,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,6 +44,7 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
     Button xButton,registerButton;
     EditText emailText,passwordText,passwordConfirmText,nameText,phoneNumText;
     TextView passwordConfirmAnnounce,emailConfirmText,passwordNotice,passwordValid;
+    ConstraintLayout loadingLayout;
 
     boolean passwordCheck;
     static boolean emailCheckCompleted;
@@ -63,6 +70,7 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
         emailConfirmText = findViewById(R.id.emailConfirmText);
         passwordNotice = findViewById(R.id.passwordNotice);
         passwordValid = findViewById(R.id.passwordValid);
+        loadingLayout = findViewById(R.id.loadingLayout);
 
         //클릭 리스너 관련
         xButton.setOnClickListener(this);
@@ -85,11 +93,18 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onClick(View v) {
         if(v==xButton){
             onBackPressed();
         }else if(v==registerButton){
+            loadingLayout.setVisibility(View.VISIBLE);
+            ProgressBar proBar = (ProgressBar) findViewById(R.id.progressBar);
+            if (proBar != null) {
+                proBar.setIndeterminate(true);
+                proBar.setIndeterminateTintList(ColorStateList.valueOf(Color.rgb(175,18,18)));
+            }
             createAccount();
 
         }
@@ -232,6 +247,7 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
                         if (task.isSuccessful()) {
                             Log.d(TAG, "User profile updated.");
                             Toast.makeText(getApplicationContext(),"회원가입이 완료되었습니다.",Toast.LENGTH_SHORT);
+                            loadingLayout.setVisibility(View.GONE);
                             onBackPressed();
                         }
                     }

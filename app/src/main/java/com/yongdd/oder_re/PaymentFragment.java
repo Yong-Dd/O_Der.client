@@ -1,5 +1,7 @@
 package com.yongdd.oder_re;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,12 +15,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,22 +55,23 @@ import java.util.TreeSet;
 public class PaymentFragment extends Fragment{
     FrameLayout noLogin;
     static FrameLayout emptyPayment;
-    RecyclerView choiceMenuRecyclerView;
-    static PaymentAdapter paymentAdapter;
-    public static ArrayList<Payment> paymentLists;
-    boolean logIn;
     static Button paymentButton;
     static int dbTotalPrice;
     CheckBox stampCheckBox;
     LinearLayout stampFalseLayout, stampTrueLayout;
     TextView stampCountText;
+    static ConstraintLayout loadingLayout;
+    static ProgressBar progressBar;
 
+    public static ArrayList<Payment> paymentLists;
+    boolean logIn;
     static int plusStampCount;
+
+    RecyclerView choiceMenuRecyclerView;
+    static PaymentAdapter paymentAdapter;
 
     MenuFragment menuFragment = new MenuFragment();
     final static DecimalFormat priceFormat = new DecimalFormat("###,###");
-
-
     final String TAG = "paymentFragment";
 
     @Nullable
@@ -77,11 +83,21 @@ public class PaymentFragment extends Fragment{
         emptyPayment = view.findViewById(R.id.emptyPayment);
         paymentButton = view.findViewById(R.id.paymentButton);
         paymentButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
+                loadingLayout.setVisibility(View.VISIBLE);
+                if (progressBar != null) {
+                    progressBar.setIndeterminate(true);
+                    progressBar.setIndeterminateTintList(ColorStateList.valueOf(Color.rgb(175,18,18)));
+                }
                 updateDB();
             }
         });
+
+        //loading 관련
+        loadingLayout = view.findViewById(R.id.P_loadingLayout);
+        progressBar = view.findViewById(R.id.progressBar);
 
         //스탬프 관련
         stampCheckBox = view.findViewById(R.id.stampCheckBox);
@@ -373,6 +389,7 @@ public class PaymentFragment extends Fragment{
                     Log.d(TAG, "addDB complete");
                     stampPlus();
                     clearOrder();
+                    loadingLayout.setVisibility(View.GONE);
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,menuFragment).commit();
                 }
             }
@@ -380,7 +397,7 @@ public class PaymentFragment extends Fragment{
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "addDB failed" + e.toString());
-                Toast.makeText(getContext(), "회원등록에 실패하였습니다.", Toast.LENGTH_SHORT);
+                Toast.makeText(getContext(), "결제에 실패했습니다.", Toast.LENGTH_SHORT);
             }
         });
 

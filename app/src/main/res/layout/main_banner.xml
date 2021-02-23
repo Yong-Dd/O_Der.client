@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
+            android:gravity="center_vertical"
             android:orientation="vertical">
 
             <TextView
@@ -51,29 +52,12 @@
                 android:text="봄 한정으로 돌아온 인기 메뉴! \n 달달한 딸기가 한가득 들어있습니다"
                 android:textColor="@color/black" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <android.widget.Button
-                    android:id="@+id/banner_menuGo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="45dp"
-                    android:layout_gravity="center|center_horizontal"
-                    android:background="@drawable/main_button"
-                    android:paddingLeft="20dp"
-                    android:paddingRight="20dp"
-                    android:text="메뉴 바로가기"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-            </FrameLayout>
-
         </LinearLayout>
 
         <ImageView
             android:id="@+id/banner_img"
-            android:layout_width="300dp"
-            android:layout_height="200dp"
+            android:layout_width="200dp"
+            android:layout_height="150dp"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"

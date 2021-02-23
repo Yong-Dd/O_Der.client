@@ -229,7 +229,7 @@
         android:layout_marginRight="20dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="- 10개 이상이 될 시 스탬프는 더 이상 적립되지 않습니다." />
+        android:text="- 10개 단위로 1회 사용이 가능합니다." />
 
     <TextView
         android:id="@+id/textView11"
