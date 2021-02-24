@@ -65,6 +65,7 @@ public class PaymentFragment extends Fragment{
 
     public static ArrayList<Payment> paymentLists;
     boolean logIn;
+    boolean stampCheck;
     static int plusStampCount;
 
     RecyclerView choiceMenuRecyclerView;
@@ -100,20 +101,24 @@ public class PaymentFragment extends Fragment{
         progressBar = view.findViewById(R.id.progressBar);
 
         //스탬프 관련
+        stampCheck = false;
         stampCheckBox = view.findViewById(R.id.stampCheckBox);
         stampCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     totalPriceSetting(true);
+                    stampCheck = true;
                 }else{
                     totalPriceSetting(false);
+                    stampCheck = false;
                 }
             }
         });
         stampFalseLayout = view.findViewById(R.id.stampFalseLayout);
         stampTrueLayout = view.findViewById(R.id.stampTrueLayout);
         stampCountText = view.findViewById(R.id.stampCountText);
+
 
         SetStampLayout();
 
@@ -420,7 +425,12 @@ public class PaymentFragment extends Fragment{
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot child: snapshot.getChildren()) {
                     int curretStamp = child.child("userStamp").getValue(Integer.class);
-                    child.getRef().child("userStamp").setValue(curretStamp+ plusStampCount);
+                    if(stampCheck){
+                        child.getRef().child("userStamp").setValue(curretStamp - 10);
+                    }else{
+                        child.getRef().child("userStamp").setValue(curretStamp + plusStampCount);
+                    }
+
                 }
             }
 
