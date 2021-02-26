@@ -39,6 +39,8 @@ public class IntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.intro_activity);
 
+        Log.d("Banner","create");
+
         ProgressBar proBar = (ProgressBar) findViewById(R.id.progressBar);
         if (proBar != null) {
             proBar.setIndeterminate(true);
@@ -50,8 +52,12 @@ public class IntroActivity extends AppCompatActivity {
     }
 
     public void getBannerDB(){
+        Log.d("Banner","getBannerDB called");
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
+        Log.d("Banner","getBannerDB database");
         DatabaseReference ref = database.getReference("banners");
+        Log.d("Banner","getBannerDB reference");
         ref.orderByChild("titleName").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -69,11 +75,14 @@ public class IntroActivity extends AppCompatActivity {
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
+            public void onCancelled(@NonNull DatabaseError error) { Log.d("Banner","getBannerDB error "+error);}
         });
+
     }
 
     public void getImageUri(Banner banner){
+        Log.d("Banner","imageUri called");
+
         String imgPath = banner.getMenuImgPath();
 
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://oder-e6555.appspot.com");
@@ -83,7 +92,6 @@ public class IntroActivity extends AppCompatActivity {
             public void onSuccess(Uri uri) {
                 banners.add(banner);
                 uris.add(uri);
-
                 if((banners.size()>=3)&&(uris.size()>=3)){
                     Log.d("Banner","banner 넘김"+banners.size());
                     Intent intent = new Intent(IntroActivity.this, MainActivity.class);
@@ -96,7 +104,7 @@ public class IntroActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.d("Banner","Uri 오류");
+                Log.d("Banner","Uri 오류 "+exception);
             }
         });
 

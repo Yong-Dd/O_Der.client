@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -62,6 +63,7 @@ public class PaymentFragment extends Fragment{
     TextView stampCountText;
     static ConstraintLayout loadingLayout;
     static ProgressBar progressBar;
+    EditText memoText;
 
     public static ArrayList<Payment> paymentLists;
     boolean logIn;
@@ -92,9 +94,18 @@ public class PaymentFragment extends Fragment{
                     progressBar.setIndeterminate(true);
                     progressBar.setIndeterminateTintList(ColorStateList.valueOf(Color.rgb(175,18,18)));
                 }
-                updateDB();
+
+                if (memoText.getText().toString().length() == 0) {
+                    updateDB("");
+                } else {
+                    String memo = memoText.getText().toString().trim();
+                    updateDB(memo);
+                }
+
+
             }
         });
+        memoText = view.findViewById(R.id.memo);
 
         //loading 관련
         loadingLayout = view.findViewById(R.id.P_loadingLayout);
@@ -150,8 +161,6 @@ public class PaymentFragment extends Fragment{
         }else{
             logInSetting(false);
         }
-
-        //총가격 세팅
 
 
         return view;
@@ -274,7 +283,7 @@ public class PaymentFragment extends Fragment{
         return totalPrice;
     }
 
-    private void updateDB(){
+    private void updateDB(String memo){
         Log.d(TAG,"update DB called");
 
         String userId = MainActivity.USER_ID;
@@ -308,7 +317,7 @@ public class PaymentFragment extends Fragment{
 
 
 
-        Order orderList = new Order(userId,paymentLists,dbTotalPrice,orderDate,orderReceivedTime,"","");
+        Order orderList = new Order(userId,paymentLists,dbTotalPrice,orderDate,orderReceivedTime,"","",memo);
 
         if(orderList!=null){
             getMaxCount(orderList);
