@@ -1,6 +1,7 @@
 package com.yongdd.oder_re;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -29,7 +30,7 @@ public class OrderList extends AppCompatActivity {
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     static RecyclerView orderListRecyclerview;
     static OrderListAdapter orderListAdapter;
-    static ArrayList<Order> orderLists = new ArrayList<>();
+    static ArrayList<OrderId> orderLists = new ArrayList<>();
     int count;
 
     @Override
@@ -46,7 +47,7 @@ public class OrderList extends AppCompatActivity {
 
         orderListRecyclerview.setHasFixedSize(true);
         orderListRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-//        orderListRecyclerview.setAdapter(adapter);
+
 
 
         Button backButton = findViewById(R.id.backButton);
@@ -66,6 +67,7 @@ public class OrderList extends AppCompatActivity {
         database.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("orderList","order count called");
                 long maxCount = snapshot.getChildrenCount();
                 getOrderList(maxCount,userId);
             }
@@ -82,19 +84,29 @@ public class OrderList extends AppCompatActivity {
         ref.orderByChild("userId").equalTo(userId).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                Log.d("orderList","child add called");
+                String orderId = snapshot.getKey();
                 Order order = snapshot.getValue(Order.class);
-                orderLists.add(order);
+                orderLists.add(new OrderId(orderId,order));
 
                 count+=1;
 
                if(count==totalCount){
+                   Log.d("orderList","count == totalCount "+count+", "+totalCount);
                    setReverseOrderList();
+                   count=0;
+               }else{
+                   Log.d("orderList","count != totalCount "+count+", "+totalCount);
                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                String orderId = snapshot.getKey();
+                Order order = snapshot.getValue(Order.class);
+                setOrderConditionChanged(orderId,order);
+                Log.d("orderList","child Changed called");
+
 
             }
 
@@ -113,16 +125,34 @@ public class OrderList extends AppCompatActivity {
 
             }
         });
-        setReverseOrderList();
     }
 
     private void setReverseOrderList(){
         Collections.reverse(orderLists);
 
-        for(Order order:orderLists){
+        for(OrderId orderid:orderLists){
+            Order order = orderid.getOrder();
             orderListAdapter.addItem(order);
             orderListRecyclerview.setAdapter(orderListAdapter);
             orderListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void setOrderConditionChanged(String orderId, Order order){
+        orderListAdapter.clearItem();
+        setReverseOrderList();
+
+        Collections.reverse(orderLists);
+
+        for(int i=orderLists.size()-1; i==0; i--){
+            String orderId1 = orderLists.get(i).getOrderId();
+
+            if(orderId1.equals(orderId)){
+                Log.d("orderList","equals id , changed");
+                orderListAdapter.updateItem(i,order);
+                orderListRecyclerview.setAdapter(orderListAdapter);
+                orderListAdapter.notifyItemChanged(i);
+            }
         }
     }
 
@@ -130,6 +160,8 @@ public class OrderList extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
 
+        orderLists.clear();
+        orderListAdapter.clearItem();
         finish();
         overridePendingTransition(R.anim.page_slide_in_left, R.anim.page_slide_out_right);
 

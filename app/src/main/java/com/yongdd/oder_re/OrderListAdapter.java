@@ -52,6 +52,9 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         return orderLists.get(position);
     }
 
+    public void updateItem(int position, Order order){orderLists.set(position,order);}
+
+    public void clearItem(){orderLists.clear();}
 
     public class OrderListViewHolder extends RecyclerView.ViewHolder{
         TextView orderDate;
@@ -89,7 +92,7 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
             //주문 날짜 등 지정
             String orderAcceptedTime = orderList.getOrderAcceptedTime();
             String orderCompletedTime = orderList.getOrderCompletedTime();
-            Log.d("orderListAdapter",orderAcceptedTime+", "+orderAcceptedTime);
+//            Log.d("orderListAdapter",orderAcceptedTime+", "+orderAcceptedTime);
 
             orderDate.setText(orderList.getOrderDate());
             orderReceived.setText(orderList.getOrderReceivedTime());

@@ -116,6 +116,7 @@ public class LogIn extends Activity implements View.OnClickListener {
 
                         }else{
                             Log.d(TAG,"logIn failed");
+                            loadingLayout.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(),"아이디와 비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show();
                             return;
                         }

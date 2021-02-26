@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -284,15 +285,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(accountClicked){
-            accountFragment.reloadView();
-            accountClicked = false;
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -313,8 +305,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         dialog.cancel();
                     }
                 });
+        final AlertDialog dialog = builder.create();
+
+        dialog.setOnShowListener( new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface arg0) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.rgb(175,18,18));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+            }
+        });
+        dialog.show();
+
+
+        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("앱을 종료하시겠습니까?")
+                .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        moveTaskToBack(true); // 태스크를 백그라운드로 이동
+                        finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
+                        android.os.Process.killProcess(android.os.Process.myPid()); // 앱 프로세스 종료
+                    }
+                })
+                .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
         exitAlertDialog = builder.create();
-        exitAlertDialog.show();
+        exitAlertDialog.show();*/
 
     }
 

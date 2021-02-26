@@ -48,7 +48,6 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.account_fragment,container,false);
 
-        Log.d("start111","accountFragment start");
         orderListButton = view.findViewById(R.id.A_orderListButton);
         stampButton = view.findViewById(R.id.A_stampButton);
         logOutButton = view.findViewById(R.id.A_logOutButton);
@@ -103,6 +102,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
             PaymentFragment paymentFragment = new PaymentFragment();
 
             mainActivity.logInSetting(false,"");
+            OrderList.orderLists.clear();
 
             reloadView();
         }else if(v==nameEditButton){
@@ -113,14 +113,15 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
             nameText.setText(name);
             editName.setText("");
             mainActivity.logInSetting(true,name);
+            editName(name);
 
         }
     }
 
     public void logInSetting(boolean login){
         if(login){
-
             noLogin.setVisibility(View.GONE);
+//            reloadView();
         }else{
             noLogin.setVisibility(View.VISIBLE);
         }
