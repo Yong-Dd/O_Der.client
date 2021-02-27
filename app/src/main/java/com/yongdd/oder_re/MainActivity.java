@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -196,12 +197,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                Menu menu = snapshot.getValue(Menu.class);
+                getMenuImgUriChange(menu,Integer.parseInt(snapshot.getKey()));
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
+                deleteMenu(Integer.parseInt(snapshot.getKey()));
             }
 
             @Override
@@ -219,22 +221,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void getMenuImgUri(Menu menu,int menuId){
 
         String imgPath = menu.getMenuImgPath();
-
-        FirebaseStorage storage = FirebaseStorage.getInstance("gs://oder-e6555.appspot.com");
-        StorageReference storageRef = storage.getReference();
-        storageRef.child(imgPath).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                menus.add(new MenuUri(new Menu(menuId,menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
-                        menu.getMenuName(),menu.getMenuPrice()),uri));
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                menus.add(new MenuUri(new Menu(menuId,menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
-                        menu.getMenuName(),menu.getMenuPrice()),null));
-            }
-        });
+        if(imgPath.equals("") || imgPath == ""){
+            menus.add(new MenuUri(new Menu(menuId,menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
+                    menu.getMenuName(),menu.getMenuPrice()),null));
+        }else{
+            FirebaseStorage storage = FirebaseStorage.getInstance("gs://oder-e6555.appspot.com");
+            StorageReference storageRef = storage.getReference();
+            storageRef.child(imgPath).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    menus.add(new MenuUri(new Menu(menuId,menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
+                            menu.getMenuName(),menu.getMenuPrice()),uri));
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    menus.add(new MenuUri(new Menu(menuId,menu.getMenuDelimiter(),menu.getMenuHotIce(),menu.getMenuImgPath(),
+                            menu.getMenuName(),menu.getMenuPrice()),null));
+                }
+            });
+        }
     }
 
     public void getUserId(){
@@ -285,6 +291,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void getMenuImgUriChange(Menu menu, int menuId){
+
+        String imgPath = menu.getMenuImgPath();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://oder-e6555.appspot.com");
+        StorageReference storageRef = storage.getReference();
+        storageRef.child(imgPath).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                for(int i=0; i<menus.size(); i++) {
+                    int menu_id = menus.get(i).getMenu().getMenuId();
+                    if(menu_id==menuId) {
+                        menus.set(i,new MenuUri(menu,uri));
+                        menuFragment.updateItem(i,new MenuUri(menu,uri));
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(getApplicationContext(),"수정된 메뉴를 새로 불러오는데 실패했습니다.",Toast.LENGTH_SHORT).show();
+                for(int i=0; i<menus.size(); i++) {
+                    int menu_id = menus.get(i).getMenu().getMenuId();
+                    if(menu_id==menu_id) {
+                        menus.set(i,new MenuUri(menu,null));
+                    }
+                }
+            }
+        });
+    }
+
+    public void deleteMenu(int menuId){
+        for(int i=0; i<menus.size(); i++) {
+            int menu_id = menus.get(i).getMenu().getMenuId();
+            if(menu_id==menuId) {
+                menus.remove(i);
+                menuFragment.deleteMenu(i);
+            }
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -315,27 +362,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         dialog.show();
-
-
-        /*AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("앱을 종료하시겠습니까?")
-                .setPositiveButton("예", new DialogInterface.OnClickListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        moveTaskToBack(true); // 태스크를 백그라운드로 이동
-                        finishAndRemoveTask(); // 액티비티 종료 + 태스크 리스트에서 지우기
-                        android.os.Process.killProcess(android.os.Process.myPid()); // 앱 프로세스 종료
-                    }
-                })
-                .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        exitAlertDialog = builder.create();
-        exitAlertDialog.show();*/
 
     }
 

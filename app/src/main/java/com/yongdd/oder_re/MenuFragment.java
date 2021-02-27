@@ -33,6 +33,7 @@ public class MenuFragment extends Fragment {
     static Button orderButton;
 
     static int orderCount;
+    static int lastClickedMenu;
 
     //주문 목록
     static ArrayList<Payment> orderLists = new ArrayList<>();
@@ -43,6 +44,8 @@ public class MenuFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.menu_fragment,container,false);
+
+        lastClickedMenu = -1;
 
         context = view.getContext();
         menus = new ArrayList<>();
@@ -115,6 +118,7 @@ public class MenuFragment extends Fragment {
     }
 
     public void menuChoice(int position){
+        lastClickedMenu = position;
         menuAdapter.clearItem();
        for(int i=0; i<menus.size(); i++){
            MenuUri menu = menus.get(i);
@@ -193,5 +197,24 @@ public class MenuFragment extends Fragment {
             setOrderButton(true,0);
         }
 
+    }
+
+    public void updateItem(int position, MenuUri menuUri){
+        Log.d("editMenu","updateItem called position "+position);
+        menus.set(position,menuUri);
+        int menuDelimiter = menuUri.getMenu().getMenuDelimiter();
+        if(menuDelimiter == lastClickedMenu+1){
+            int lastPosition = menuAdapter.updateItem(menuUri);
+            Log.d("editMenu","menuAdapter updateItem last position " +lastPosition);
+            menuAdapter.notifyItemChanged(lastPosition);
+        }else{
+            menuChoice(lastClickedMenu);
+        }
+
+    }
+
+    public void deleteMenu(int position){
+        menus.remove(position);
+        menuChoice(lastClickedMenu);
     }
 }

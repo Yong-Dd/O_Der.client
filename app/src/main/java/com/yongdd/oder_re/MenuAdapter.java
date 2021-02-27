@@ -34,6 +34,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
     ArrayList<MenuUri> menus = new ArrayList<>();
     Context context;
     MenuDetailFragment menuDetailFragment;
+    static int lastPosition;
 
     @NonNull
     @Override
@@ -73,6 +74,11 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
     public void clearItem(){
         menus.clear();
+    }
+
+    public int updateItem(MenuUri menuUri){
+        menus.set(lastPosition,menuUri);
+        return lastPosition;
     }
 
 
@@ -117,6 +123,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         public void onClick(View v) {
             if(v==menuImage || v==menuInfo){
               int position = getAdapterPosition();
+              lastPosition = position;
               MenuUri menuUri = menus.get(position);
               MenuDetailFragment.setItem(menuUri);
               MenuFragment.menuDetailShow(true);
