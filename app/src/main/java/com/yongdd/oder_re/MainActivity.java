@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             int menu_id = menus.get(i).getMenu().getMenuId();
             if(menu_id==menuId) {
                 menus.remove(i);
-                menuFragment.deleteMenu(i);
+                menuFragment.deleteMenu();
             }
         }
     }

@@ -213,8 +213,8 @@ public class MenuFragment extends Fragment {
 
     }
 
-    public void deleteMenu(int position){
-        menus.remove(position);
+    public void deleteMenu(){
+        menus = MainActivity.menus;
         menuChoice(lastClickedMenu);
     }
 }
