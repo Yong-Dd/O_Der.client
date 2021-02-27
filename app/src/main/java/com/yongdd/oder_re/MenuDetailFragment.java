@@ -143,6 +143,7 @@ public class MenuDetailFragment extends Fragment implements View.OnClickListener
         }
 
     }
+
     public static void hotIceUISetting(int hotIce){
         switch (hotIce){
             case 1:

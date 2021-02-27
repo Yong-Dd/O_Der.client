@@ -34,8 +34,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
     ArrayList<MenuUri> menus = new ArrayList<>();
     Context context;
     MenuDetailFragment menuDetailFragment;
-    FragmentManager fragmentManager;
-    FragmentTransaction fragmentTransaction;
+
     @NonNull
     @Override
     public MenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -124,22 +123,4 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
             }
         }
     }
-
-  /*  public void setImage(String imgPath,ImageView menuImage){
-        FirebaseStorage storage = FirebaseStorage.getInstance("gs://oder-e6555.appspot.com");
-        StorageReference storageRef = storage.getReference();
-        storageRef.child(imgPath).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Log.d("menuAdapter","uri"+uri);
-                Glide.with(context).load(uri).into((ImageView) menuImage);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                menuImage.setImageResource(R.drawable.standard_img);
-            }
-        });
-    }*/
-
 }

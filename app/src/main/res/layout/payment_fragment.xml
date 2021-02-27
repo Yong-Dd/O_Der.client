@@ -153,7 +153,8 @@
                         android:paddingTop="15dp"
                         android:paddingBottom="15dp"
                         android:textColor="@color/black"
-                        android:textCursorDrawable="@drawable/cursor" />
+                        android:textCursorDrawable="@drawable/cursor"
+                        android:backgroundTint="@drawable/input_focus"/>
 
                     <TextView
                         android:id="@+id/line2"
