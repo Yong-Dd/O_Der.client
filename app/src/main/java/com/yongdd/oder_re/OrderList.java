@@ -87,71 +87,45 @@ public class OrderList extends AppCompatActivity {
                 Log.d("orderList","child add called");
                 String orderId = snapshot.getKey();
                 Order order = snapshot.getValue(Order.class);
-                orderLists.add(new OrderId(orderId,order));
+                orderLists.add(0,new OrderId(orderId,order));
+                orderListAdapter.addReverseItem(order);
+                orderListRecyclerview.setAdapter(orderListAdapter);
+                orderListAdapter.notifyDataSetChanged();
 
-                count+=1;
-
-               if(count==totalCount){
-                   Log.d("orderList","count == totalCount "+count+", "+totalCount);
-                   setReverseOrderList();
-                   count=0;
-               }else{
-                   Log.d("orderList","count != totalCount "+count+", "+totalCount);
-               }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                Log.d("orderList","child Changed called");
                 String orderId = snapshot.getKey();
                 Order order = snapshot.getValue(Order.class);
+                Log.d("orderList","child Changed orderId "+orderId);
                 setOrderConditionChanged(orderId,order);
-                Log.d("orderList","child Changed called");
-
-
+                Log.d("orderList","child Changed end");
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
 
-    private void setReverseOrderList(){
-        Collections.reverse(orderLists);
-
-        for(OrderId orderid:orderLists){
-            Order order = orderid.getOrder();
-            orderListAdapter.addItem(order);
-            orderListRecyclerview.setAdapter(orderListAdapter);
-            orderListAdapter.notifyDataSetChanged();
-        }
-    }
-
     public void setOrderConditionChanged(String orderId, Order order){
-        orderListAdapter.clearItem();
-        setReverseOrderList();
-
-        Collections.reverse(orderLists);
-
-        for(int i=orderLists.size()-1; i==0; i--){
+        Log.d("orderList","setOrderConditionChanged called");
+        for(int i=0; i<orderLists.size(); i++){
             String orderId1 = orderLists.get(i).getOrderId();
-
+            Log.d("orderList","setOrderConditionChanged i "+i);
+            Log.d("orderList","setOrderConditionChanged orderId1 "+orderId1);
             if(orderId1.equals(orderId)){
                 Log.d("orderList","equals id , changed");
                 orderListAdapter.updateItem(i,order);
-                orderListRecyclerview.setAdapter(orderListAdapter);
                 orderListAdapter.notifyItemChanged(i);
+            //    orderListAdapter.notifyDataSetChanged();
             }
         }
     }

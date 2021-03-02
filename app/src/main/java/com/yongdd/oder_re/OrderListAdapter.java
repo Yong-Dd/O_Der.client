@@ -48,6 +48,8 @@ public class OrderListAdapter extends RecyclerView.Adapter<OrderListAdapter.Orde
         orderLists.add(orderList);
     }
 
+    public void addReverseItem(Order orderList){orderLists.add(0,orderList);}
+
     public Order getItem(int position){
         return orderLists.get(position);
     }
