@@ -123,24 +123,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 메뉴 가져오기
         getMenuDB();
 
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w("TAG", "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-
-                        // Log and toast
-                        Log.d("TAGssss", token);
-                    }
-                });
-
-
 
     }
 
@@ -187,6 +169,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //User Id setting
             getUserId();
             getStampCount();
+
+            //token setting
+            getToken();
 
 
         }else{
@@ -406,6 +391,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+    }
+
+    private void getToken(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("TAG", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+                        Log.d("token",token);
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        String email = user.getEmail();
+
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference ref = database.getReference("users");
+                        ref.orderByChild("userEmail").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot child: snapshot.getChildren()) {
+                                    String userToken = child.child("userToken").getValue(String.class);
+                                    if(!userToken.equals(token)) {
+                                        child.getRef().child("userToken").setValue(token);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) { }
+                        });
+                    }
+                });
+
     }
 
     @Override

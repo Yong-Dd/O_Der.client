@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -26,13 +27,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void sendNotification(RemoteMessage remoteMessage) {
 
         String title = remoteMessage.getData().get("title");
+//        Log.d("notification", title);
+
         String message = remoteMessage.getData().get("message");
 
         final String CHANNEL_ID = "ChannerID";
         NotificationManager mManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            final String CHANNEL_NAME = "ChannerName";
-            final String CHANNEL_DESCRIPTION = "ChannerDescription";
+            final String CHANNEL_NAME = "O:Der";
+            final String CHANNEL_DESCRIPTION = "음료가 완료되었습니다.";
             final int importance = NotificationManager.IMPORTANCE_HIGH;
 
             // add in API level 26
@@ -46,11 +49,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID);
-        builder.setSmallIcon(R.drawable.ic_launcher_background);
+        builder.setSmallIcon(R.drawable.ic_launcher_app_icon);
         builder.setAutoCancel(true);
         builder.setDefaults(Notification.DEFAULT_ALL);
         builder.setWhen(System.currentTimeMillis());
         builder.setSmallIcon(R.mipmap.ic_launcher);
+//        builder.setContentTitle("O:Der");
+//        builder.setContentText("음료가 완료되었습니다.");
         builder.setContentTitle(title);
         builder.setContentText(message);
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {

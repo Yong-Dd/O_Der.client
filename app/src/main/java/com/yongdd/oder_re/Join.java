@@ -34,6 +34,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -127,7 +128,7 @@ public class Join extends Activity implements View.OnClickListener, View.OnFocus
             String phoneNumber = phoneNumText.getText().toString().trim();
 
             //등록 위한 세팅
-            User user = new User(email, name, phoneNumber,0);
+            User user = new User(email, name, phoneNumber,0, "");
 
             //db 등록 위한 maxCount가져오기
             DatabaseReference database = FirebaseDatabase.getInstance().getReference().child("users");
