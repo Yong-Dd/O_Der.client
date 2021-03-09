@@ -16,20 +16,36 @@ import androidx.core.app.NotificationCompat;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Map;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        super.onMessageReceived(remoteMessage);
-        sendNotification(remoteMessage);
+      //  super.onMessageReceived(remoteMessage);
+        try {
+            if(remoteMessage!=null) {
+                sendNotification(remoteMessage);
+            }else{
+                Log.d("notification","remoteMessage is null");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void sendNotification(RemoteMessage remoteMessage) {
+    private void sendNotification(RemoteMessage remoteMessage) throws JSONException {
 
         String title = remoteMessage.getData().get("title");
-//        Log.d("notification", title);
-
         String message = remoteMessage.getData().get("message");
+        if(title==null){
+           title = remoteMessage.getNotification().getTitle();
+           message = remoteMessage.getNotification().getBody();
+
+        }
 
         final String CHANNEL_ID = "ChannerID";
         NotificationManager mManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -54,10 +70,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         builder.setDefaults(Notification.DEFAULT_ALL);
         builder.setWhen(System.currentTimeMillis());
         builder.setSmallIcon(R.mipmap.ic_launcher);
-//        builder.setContentTitle("O:Der");
-//        builder.setContentText("음료가 완료되었습니다.");
         builder.setContentTitle(title);
         builder.setContentText(message);
+        //builder.setContentIntent()
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             builder.setContentTitle(title);
             builder.setVibrate(new long[]{500, 500});
@@ -65,8 +80,4 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         mManager.notify(0, builder.build());
     }
 
-    @Override
-    public void onNewToken(@NonNull String s) {
-        super.onNewToken(s);
-    }
 }
