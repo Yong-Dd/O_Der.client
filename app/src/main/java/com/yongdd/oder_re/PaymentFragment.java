@@ -41,6 +41,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONObject;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -54,6 +59,8 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 public class PaymentFragment extends Fragment{
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+
     FrameLayout noLogin;
     static FrameLayout emptyPayment;
     static Button paymentButton;
@@ -403,6 +410,7 @@ public class PaymentFragment extends Fragment{
                     Log.d(TAG, "addDB complete");
                     stampPlus();
                     clearOrder();
+                    sendNotification();
                     loadingLayout.setVisibility(View.GONE);
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer,menuFragment).commit();
                 }
@@ -469,6 +477,54 @@ public class PaymentFragment extends Fragment{
             plusStamp=0;
         }
         return plusStamp;
+    }
+
+    public void sendNotification(){
+        final String FCM_MESSAGE_URL = "https://fcm.googleapis.com/fcm/send";
+        final String SERVER_KEY = "AAAA9EetdA4:APA91bFoaEw-hzCziWA36z1UCer2KmJC06W0gE5s2Vn6YIba1HIMVkqjN0TaLZsz1YA-BDeF-4ZrNU2ENQRM0aFGPtAFTdnbizrhvgBV5o36ED-Tli-PcVyecP9RGKZOIT-K5phMHgYz";
+
+        DatabaseReference ref = database.getReference("seller");
+        ref.orderByChild("token").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+              String token =  snapshot.child("token").getValue(String.class);
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // FMC 메시지 생성 start
+                            JSONObject root = new JSONObject();
+                            JSONObject notification = new JSONObject();
+                            notification.put("title", "O:Der");
+                            notification.put("body", "새로운 주문이 도착했습니다.");
+                            root.put("notification", notification);
+                            root.put("to", token);
+
+                            // FMC 메시지 생성 end
+                            URL Url = new URL(FCM_MESSAGE_URL);
+                            HttpURLConnection conn = (HttpURLConnection) Url.openConnection();
+                            conn.setRequestMethod("POST");
+                            conn.setDoOutput(true);
+                            conn.setDoInput(true);
+                            conn.addRequestProperty("Authorization", "key=" + SERVER_KEY);
+                            conn.setRequestProperty("Accept", "application/json");
+                            conn.setRequestProperty("Content-type", "application/json");
+                            OutputStream os = conn.getOutputStream();
+                            os.write(root.toString().getBytes("utf-8"));
+                            os.flush();
+                            conn.getResponseCode();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
     }
 
 }
