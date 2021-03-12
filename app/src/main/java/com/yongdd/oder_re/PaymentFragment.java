@@ -480,6 +480,7 @@ public class PaymentFragment extends Fragment{
     }
 
     public void sendNotification(){
+        Log.d("notification","sendNotification called");
         final String FCM_MESSAGE_URL = "https://fcm.googleapis.com/fcm/send";
         final String SERVER_KEY = "AAAA9EetdA4:APA91bFoaEw-hzCziWA36z1UCer2KmJC06W0gE5s2Vn6YIba1HIMVkqjN0TaLZsz1YA-BDeF-4ZrNU2ENQRM0aFGPtAFTdnbizrhvgBV5o36ED-Tli-PcVyecP9RGKZOIT-K5phMHgYz";
 
@@ -487,12 +488,13 @@ public class PaymentFragment extends Fragment{
         ref.orderByChild("token").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-              String token =  snapshot.child("token").getValue(String.class);
-
+              String token =  snapshot.getValue(String.class);
+                Log.d("notification","token: "+token);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
+                            Log.d("notification","json start");
                             // FMC 메시지 생성 start
                             JSONObject root = new JSONObject();
                             JSONObject notification = new JSONObject();
@@ -522,7 +524,7 @@ public class PaymentFragment extends Fragment{
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) { Log.d("notification","sendNotification database error "+databaseError);}
         });
 
     }
