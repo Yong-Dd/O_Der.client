@@ -11,7 +11,7 @@
 
 
 ### 1-1 메인 추천 배너
-<img src="https://user-images.githubusercontent.com/71385485/124074102-f91b1180-da7d-11eb-9fe3-23cedf842f9d.jpg" width="300" height="550" alt="KakaoTalk_20210429_175446138_10">
+<img src="https://user-images.githubusercontent.com/71385485/124074102-f91b1180-da7d-11eb-9fe3-23cedf842f9d.jpg" width="270" height="600" alt="KakaoTalk_20210429_175446138_10">
 
 ### 1-2 메뉴 / 메뉴 선택 / 결제이동 버튼
 <img src="https://user-images.githubusercontent.com/71385485/124074122-fe785c00-da7d-11eb-8bf3-898ccc5a641d.jpg" width="300" height="600" alt="KakaoTalk_20210429_175446138_0">
